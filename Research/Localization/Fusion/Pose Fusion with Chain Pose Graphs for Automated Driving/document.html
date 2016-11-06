@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="HMW-Alexander">
+  <title>Pose Fusion with Chain Pose Graphs for Automated Driving</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script type="text/x-mathjax-config">
+  	MathJax.Hub.Config({
+  		TeX: {
+  			equationNumbers: {autoNumber: "all"}
+  		}
+  	});
+  </script>
+</head>
+<body>
+<header>
+<h1 class="title"><strong>Pose Fusion with Chain Pose Graphs for Automated Driving</strong></h1>
+<h2 class="author">HMW-Alexander</h2>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#basic-information"><span class="toc-section-number">1</span> Basic Information</a><ul>
+<li><a href="#authors"><span class="toc-section-number">1.1</span> Authors</a></li>
+<li><a href="#conference"><span class="toc-section-number">1.2</span> Conference</a></li>
+<li><a href="#abstract"><span class="toc-section-number">1.3</span> Abstract</a></li>
+<li><a href="#keywords"><span class="toc-section-number">1.4</span> Keywords</a></li>
+</ul></li>
+<li><a href="#introduction"><span class="toc-section-number">2</span> Introduction</a><ul>
+<li><a href="#problem-solution"><span class="toc-section-number">2.1</span> Problem &amp; Solution</a></li>
+<li><a href="#objective"><span class="toc-section-number">2.2</span> Objective</a></li>
+<li><a href="#formulation"><span class="toc-section-number">2.3</span> Formulation</a></li>
+<li><a href="#contributions"><span class="toc-section-number">2.4</span> Contributions</a></li>
+</ul></li>
+<li><a href="#related-work"><span class="toc-section-number">3</span> Related Work</a><ul>
+<li><a href="#multi-sensor-data-fusion-for-navigation-systems"><span class="toc-section-number">3.1</span> Multi-sensor data fusion for navigation systems</a></li>
+<li><a href="#methodical-origin"><span class="toc-section-number">3.2</span> Methodical origin</a></li>
+</ul></li>
+<li><a href="#pose-graph-fusion"><span class="toc-section-number">4</span> Pose Graph Fusion</a><ul>
+<li><a href="#nonlinear-least-squares-problem"><span class="toc-section-number">4.1</span> Nonlinear least squares problem</a></li>
+<li><a href="#sliding-window-chain-pose-graph-fusion"><span class="toc-section-number">4.2</span> Sliding window chain pose graph fusion</a><ul>
+<li><a href="#about-the-online-state-estimation-system"><span class="toc-section-number">4.2.1</span> About the online state estimation system</a></li>
+<li><a href="#about-the-graph-structure"><span class="toc-section-number">4.2.2</span> About the graph structure</a></li>
+<li><a href="#about-the-algorithm-working-frequency"><span class="toc-section-number">4.2.3</span> About the algorithm working frequency</a></li>
+<li><a href="#about-the-system-matrix"><span class="toc-section-number">4.2.4</span> About the system matrix</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<hr />
+<h1 id="basic-information"><span class="header-section-number">1</span> Basic Information</h1>
+<h2 id="authors"><span class="header-section-number">1.1</span> Authors</h2>
+<ul>
+<li><p><strong>Christian Merfels</strong> is with Volkswagen Group Research, Wolfsburg, and Institute of Geodesy and Geoinformation, University of Bonn, Germany.</p></li>
+<li><p><strong>Cyrill Stachniss</strong> is with Institute of Geodesy and Geoinformation, University of Bonn, Germany.</p></li>
+</ul>
+<h2 id="conference"><span class="header-section-number">1.2</span> Conference</h2>
+<p>2016 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</p>
+<h2 id="abstract"><span class="header-section-number">1.3</span> Abstract</h2>
+<ul>
+<li><p>Combining multiple localization systems in a <strong>plug and play manner</strong>.</p></li>
+<li><p>Formulate this approach as a <strong>sliding window pose graph</strong>.</p></li>
+<li><p>The pose fusion approach scales from a filtering-based to a batch solution by increasing the size of the sliding window.</p></li>
+<li><p>The experiment runs at 20Hz on both simulated and real data.</p></li>
+</ul>
+<h2 id="keywords"><span class="header-section-number">1.4</span> Keywords</h2>
+<hr />
+<h1 id="introduction"><span class="header-section-number">2</span> Introduction</h1>
+<h2 id="problem-solution"><span class="header-section-number">2.1</span> Problem &amp; Solution</h2>
+<p>Individual localization system is not enough, and the combination of orthogonal localization systems is more powerful.</p>
+<h2 id="objective"><span class="header-section-number">2.2</span> Objective</h2>
+<p>This paper provides an approach to multi-sensor data fusion decouples the localization from the fusion task, which eneables the ability to incorporate third-party localization modules for which source code is unavailable.</p>
+<h2 id="formulation"><span class="header-section-number">2.3</span> Formulation</h2>
+<p>A coarse localization (red triangles), a precise but only temporary available localization (blue triangles), and odometry as dead reckoning trajectory (blue) are used to estimate the true trajectory (red) of a vehicle. The estimated poses are shown as black triangles: the goal is to approximate the unknown red line as closely as possible with the black triangles.</p>
+<p><img src="./img/posefusion.png" alt="image" style="width:80.0%" /></p>
+<h2 id="contributions"><span class="header-section-number">2.4</span> Contributions</h2>
+<ul>
+<li><p>efficient sensor fusion of generic odometry and global pose inputs <span class="math inline">\(\Rightarrow\)</span> an intuitive architecture for pose estimation and timing issues.</p></li>
+<li><p>graph construction algorithm <span class="math inline">\(\Rightarrow\)</span> a sparse block-tridiagonal structure of the system matrix <span class="math inline">\(\Rightarrow\)</span> fast solution</p></li>
+</ul>
+<hr />
+<h1 id="related-work"><span class="header-section-number">3</span> Related Work</h1>
+<h2 id="multi-sensor-data-fusion-for-navigation-systems"><span class="header-section-number">3.1</span> Multi-sensor data fusion for navigation systems</h2>
+<ul>
+<li><p><strong>filtering-based approaches</strong>: Kalman filter and its variants</p>
+<ul>
+<li><p>feature: rely at a very early stage on the Markov assumption and marginalize all older information</p></li>
+<li><p>problem: prematurely incorporating the linearization error.</p></li>
+</ul></li>
+<li><p><strong>sliding window smoothing algorithms</strong>: compute the maximum likelihood (ML) estimate by nonlinear least squares optimization to a Bayesian network, Markov random field (MRF), or factor graph.</p>
+<ul>
+<li><p>feature: consider all past measurements up to the current one; and also consider future measurements for offline batch optimization.</p></li>
+<li><p>solution: online batch optimization becomes feasible through the usage of incremental smoothing techniques, such as iSAM2<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>, that recalculate only the part of the graph that is affected by new measurements.</p></li>
+<li><p>Some implementations keep the size of the graph bounded by simply discarding older nodes and edges, thus potentially obtaining overconfident estimates.</p></li>
+</ul></li>
+</ul>
+<h2 id="methodical-origin"><span class="header-section-number">3.2</span> Methodical origin</h2>
+<ul>
+<li><p>Sibley et al.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, who are the first to introduce the concept of a slibing window filter in the context of robotics.</p></li>
+<li><p>Differences:</p>
+<ul>
+<li><p>apply this to the use case of pose fusion</p></li>
+<li><p>special design for a faster way of solving the nonlinear least squares equations, performing marginalization, and estimating the uncertainty of the output.</p></li>
+<li><p>provide a way of semantically reasoning about the prior information arising from marginalization by deriving a prior node.</p></li>
+</ul></li>
+</ul>
+<h1 id="pose-graph-fusion"><span class="header-section-number">4</span> Pose Graph Fusion</h1>
+<h2 id="nonlinear-least-squares-problem"><span class="header-section-number">4.1</span> Nonlinear least squares problem</h2>
+<p>This paper exploits the state-of-the-art graph optimization framework g2o<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p>
+<p>The key idea is that given the state vector <span class="math inline">\(x=(x_1^T, ..., x_m^T)^T\)</span> and a set of measurements, where <span class="math inline">\(z_{ij}\)</span> is the mean and <span class="math inline">\(\Omega_{ij}\)</span> is the information matrix of a single measurement relating <span class="math inline">\(x_i\)</span> to <span class="math inline">\(x_j\)</span>, least squares estimation seeks the state <span class="math display">\[x^*=\arg\min_x{\sum_{i,j}e_{ij}^T\Omega_{ij}e_{ij}}
+\label{eq:state}\]</span> that best explains all measurements given the <span class="math inline">\(\mathcal{l}_2\)</span> norm. The vector error function <span class="math inline">\(e_{ij}=e(x_i,x_j,z_{ij})\)</span> measures how well the constraint from the measurement <span class="math inline">\(z_{ij}\)</span> is satisfied. Solving <span class="math inline">\((\ref{eq:state})\)</span> requires iteratively solving a linear system with the system matrix <span class="math inline">\(H\)</span> and the right-hand side vector <span class="math inline">\(b\)</span> such that <span class="math display">\[H=\sum_{i,j}{J_{ij}(x)^T\Omega_{ij}J_{ij}(x)}\]</span> <span class="math display">\[b^T=\sum_{i,j}e_{ij}^T\Omega_{ij}J_{ij}(x)\]</span> where <span class="math inline">\(J_{ij}(x)\)</span> refers to the Jacobian of the error function computed in state <span class="math inline">\(x\)</span>.</p>
+<h2 id="sliding-window-chain-pose-graph-fusion"><span class="header-section-number">4.2</span> Sliding window chain pose graph fusion</h2>
+<h3 id="about-the-online-state-estimation-system"><span class="header-section-number">4.2.1</span> About the online state estimation system</h3>
+<ul>
+<li><p>general nonlinear least squares estimation taks into account all available information within the full pose graph</p></li>
+<li><p>to keep the problem computationally tractable, it is necessary to limit the considered information.</p></li>
+<li><p>this approach achieves this by marginalizing out prior state state variables and the state vector <span class="math inline">\(x\)</span> in a sliding window pose graph is reduced to the M most recent states <span class="math inline">\(x=(x_{t-M+1}^T,...,x_t^T)^T\)</span>.</p></li>
+</ul>
+<h3 id="about-the-graph-structure"><span class="header-section-number">4.2.2</span> About the graph structure</h3>
+<ul>
+<li><p>global pose source: measure poses within a global coordinate system, e.g. Universal Transverse Mercator (UTM) coordinate</p></li>
+<li><p>local pose source: measure spatial transformations relative to the previous pose, e.g. odometry</p></li>
+<li><p>hidden nodes (from MRFs): state variables</p></li>
+<li><p>observed nodes (from MRFs): global pose constraints, connected to hidden nodes to constrain them in the global coordinate frame.</p></li>
+<li><p>edge between hidden nodes: local pose constraints.</p></li>
+<li><p>The resulting form or the graph is called <strong>chain pose graph</strong>.</p></li>
+</ul>
+<p><img src="./img/posegraph.png" alt="image" style="width:80.0%" /></p>
+<h3 id="about-the-algorithm-working-frequency"><span class="header-section-number">4.2.3</span> About the algorithm working frequency</h3>
+<ul>
+<li><p>Related graph-based approaches.</p>
+<ul>
+<li><p>generate a hidden node (state variables) every time a measurement arrives</p></li>
+<li><p>or tie their generation to a specific pose source</p></li>
+</ul></li>
+<li><p>This approach constructs a hidden node every time stamp.</p>
+<ul>
+<li><p>it queries all global pose sources for measurements and interpolate one observed node per source at the timestamp of the hidden node if measurements are available.</p></li>
+<li><p>it queries each local pose source to interpolate the edges between all two successive hidden nodes.</p></li>
+<li><p>enforce a certain matrix structure for H, to include all measurement sources in a generic way independetly of their specific output frequencies, and to a priori relate the number of state variables to the length of the interval of the sliding window.</p></li>
+</ul></li>
+</ul>
+<h3 id="about-the-system-matrix"><span class="header-section-number">4.2.4</span> About the system matrix</h3>
+<ul>
+<li><p>The block-tridiagonal</p></li>
+</ul>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>M. Kaess, H. Johannsson, R. Roberts, V. Ila, J. Leonard, and F. Del- laert, “iSAM2: Incremental Smoothing and Mapping using the Bayes tree,” Int. Journal of Robotics Research, pp. 216–235, 2012.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>G. Sibley, L. Matthies, and G. Sukhatme, “SlidingWindow Filter with Application to Planetary Landing,” Journal of Field Robotics, vol. 27, no. 5, pp. 587–608, 2010<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>R. K¨ ummerle, G. Grisetti, H. Strasdat, K. Konolige, and W. Burgard, “g2o: A General Framework for Graph Optimization,” in Proc. IEEE Int. Conf. Robotics and Automation (ICRA), 2011, pp. 3607–3613.<a href="#fnref3">↩</a></p></li>
+</ol>
+</section>
+</body>
+</html>
