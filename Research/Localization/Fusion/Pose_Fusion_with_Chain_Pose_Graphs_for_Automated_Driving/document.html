@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="author" content="HMW-Alexander">
+  <meta name="author" content="Christian Merfels, Cyrill Stachniss">
   <title>Pose Fusion with Chain Pose Graphs for Automated Driving</title>
   <style type="text/css">code{white-space: pre;}</style>
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
@@ -22,92 +22,99 @@
 <body>
 <header>
 <h1 class="title"><strong>Pose Fusion with Chain Pose Graphs for Automated Driving</strong></h1>
-<h2 class="author">HMW-Alexander</h2>
+<h2 class="author">Christian Merfels, Cyrill Stachniss</h2>
 </header>
 <nav id="TOC">
 <ul>
-<li><a href="#basic-information"><span class="toc-section-number">1</span> Basic Information</a><ul>
-<li><a href="#authors"><span class="toc-section-number">1.1</span> Authors</a></li>
-<li><a href="#conference"><span class="toc-section-number">1.2</span> Conference</a></li>
-<li><a href="#abstract"><span class="toc-section-number">1.3</span> Abstract</a></li>
-<li><a href="#keywords"><span class="toc-section-number">1.4</span> Keywords</a></li>
+<li><a href="#resources"><span class="toc-section-number">1</span> Resources</a></li>
+<li><a href="#basic-information"><span class="toc-section-number">2</span> Basic Information</a><ul>
+<li><a href="#authors"><span class="toc-section-number">2.1</span> Authors</a></li>
+<li><a href="#conference"><span class="toc-section-number">2.2</span> Conference</a></li>
+<li><a href="#abstract"><span class="toc-section-number">2.3</span> Abstract</a></li>
+<li><a href="#keywords"><span class="toc-section-number">2.4</span> Keywords</a></li>
 </ul></li>
-<li><a href="#introduction"><span class="toc-section-number">2</span> Introduction</a><ul>
-<li><a href="#problem-solution"><span class="toc-section-number">2.1</span> Problem &amp; Solution</a></li>
-<li><a href="#objective"><span class="toc-section-number">2.2</span> Objective</a></li>
-<li><a href="#formulation"><span class="toc-section-number">2.3</span> Formulation</a></li>
-<li><a href="#contributions"><span class="toc-section-number">2.4</span> Contributions</a></li>
+<li><a href="#introduction"><span class="toc-section-number">3</span> Introduction</a><ul>
+<li><a href="#problem-solution"><span class="toc-section-number">3.1</span> Problem &amp; Solution</a></li>
+<li><a href="#objective"><span class="toc-section-number">3.2</span> Objective</a></li>
+<li><a href="#formulation"><span class="toc-section-number">3.3</span> Formulation</a></li>
+<li><a href="#contributions"><span class="toc-section-number">3.4</span> Contributions</a></li>
 </ul></li>
-<li><a href="#related-work"><span class="toc-section-number">3</span> Related Work</a><ul>
-<li><a href="#multi-sensor-data-fusion-for-navigation-systems"><span class="toc-section-number">3.1</span> Multi-sensor data fusion for navigation systems</a></li>
-<li><a href="#methodical-origin"><span class="toc-section-number">3.2</span> Methodical origin</a></li>
+<li><a href="#related-work"><span class="toc-section-number">4</span> Related Work</a><ul>
+<li><a href="#multi-sensor-data-fusion-for-navigation-systems"><span class="toc-section-number">4.1</span> Multi-sensor data fusion for navigation systems</a></li>
+<li><a href="#methodical-origin"><span class="toc-section-number">4.2</span> Methodical origin</a></li>
 </ul></li>
-<li><a href="#pose-graph-fusion"><span class="toc-section-number">4</span> Pose Graph Fusion</a><ul>
-<li><a href="#nonlinear-least-squares-problem"><span class="toc-section-number">4.1</span> Nonlinear least squares problem</a></li>
-<li><a href="#sliding-window-chain-pose-graph-fusion"><span class="toc-section-number">4.2</span> Sliding window chain pose graph fusion</a><ul>
-<li><a href="#about-the-online-state-estimation-system"><span class="toc-section-number">4.2.1</span> About the online state estimation system</a></li>
-<li><a href="#about-the-graph-structure"><span class="toc-section-number">4.2.2</span> About the graph structure</a></li>
-<li><a href="#about-the-algorithm-working-frequency"><span class="toc-section-number">4.2.3</span> About the algorithm working frequency</a></li>
-<li><a href="#about-the-system-matrix-h"><span class="toc-section-number">4.2.4</span> About the system matrix <span class="math inline">\(H\)</span></a></li>
+<li><a href="#method-pose-graph-fusion"><span class="toc-section-number">5</span> Method: Pose Graph Fusion</a><ul>
+<li><a href="#nonlinear-least-squares-problem"><span class="toc-section-number">5.1</span> Nonlinear least squares problem</a></li>
+<li><a href="#sliding-window-chain-pose-graph-fusion"><span class="toc-section-number">5.2</span> Sliding window chain pose graph fusion</a><ul>
+<li><a href="#about-the-online-state-estimation-system"><span class="toc-section-number">5.2.1</span> About the online state estimation system</a></li>
+<li><a href="#about-the-graph-structure"><span class="toc-section-number">5.2.2</span> About the graph structure</a></li>
+<li><a href="#about-the-algorithm-working-frequency"><span class="toc-section-number">5.2.3</span> About the algorithm working frequency</a></li>
+<li><a href="#about-the-system-matrix-h"><span class="toc-section-number">5.2.4</span> About the system matrix <span class="math inline">\(H\)</span></a></li>
 </ul></li>
-<li><a href="#time-behavior"><span class="toc-section-number">4.3</span> Time behavior</a></li>
-<li><a href="#marginalization-in-the-form-of-a-prior-node"><span class="toc-section-number">4.4</span> Marginalization in the form of a prior node</a><ul>
-<li><a href="#effect-of-the-schur-complement-on-chain-pose-graphs"><span class="toc-section-number">4.4.1</span> Effect of the Schur complement on chain pose graphs</a></li>
-<li><a href="#derivation-of-the-prior-node"><span class="toc-section-number">4.4.2</span> Derivation of the prior node</a></li>
+<li><a href="#time-behavior"><span class="toc-section-number">5.3</span> Time behavior</a></li>
+<li><a href="#marginalization-in-the-form-of-a-prior-node"><span class="toc-section-number">5.4</span> Marginalization in the form of a prior node</a><ul>
+<li><a href="#effect-of-the-schur-complement-on-chain-pose-graphs"><span class="toc-section-number">5.4.1</span> Effect of the Schur complement on chain pose graphs</a></li>
+<li><a href="#derivation-of-the-prior-node"><span class="toc-section-number">5.4.2</span> Derivation of the prior node</a></li>
 </ul></li>
-<li><a href="#assessing-the-uncertainty-of-the-fused-estimate"><span class="toc-section-number">4.5</span> Assessing the uncertainty of the fused estimate</a></li>
-<li><a href="#noise-correlations-between-input-sources"><span class="toc-section-number">4.6</span> Noise correlations between input sources</a></li>
+<li><a href="#assessing-the-uncertainty-of-the-fused-estimate"><span class="toc-section-number">5.5</span> Assessing the uncertainty of the fused estimate</a></li>
+<li><a href="#noise-correlations-between-input-sources"><span class="toc-section-number">5.6</span> Noise correlations between input sources</a></li>
 </ul></li>
-<li><a href="#evaluation"><span class="toc-section-number">5</span> Evaluation</a><ul>
-<li><a href="#experiment-on-a-real-prototype-vehicle"><span class="toc-section-number">5.1</span> Experiment on a real prototype vehicle</a><ul>
-<li><a href="#settings"><span class="toc-section-number">5.1.1</span> Settings</a></li>
-<li><a href="#pose-estimate-quality"><span class="toc-section-number">5.1.2</span> Pose estimate quality</a></li>
-<li><a href="#latency-and-availability"><span class="toc-section-number">5.1.3</span> Latency and availability</a></li>
-<li><a href="#runtime-performance"><span class="toc-section-number">5.1.4</span> Runtime performance</a></li>
+<li><a href="#evaluation"><span class="toc-section-number">6</span> Evaluation</a><ul>
+<li><a href="#experiment-on-a-real-prototype-vehicle"><span class="toc-section-number">6.1</span> Experiment on a real prototype vehicle</a><ul>
+<li><a href="#settings"><span class="toc-section-number">6.1.1</span> Settings</a></li>
+<li><a href="#pose-estimate-quality"><span class="toc-section-number">6.1.2</span> Pose estimate quality</a></li>
+<li><a href="#latency-and-availability"><span class="toc-section-number">6.1.3</span> Latency and availability</a></li>
+<li><a href="#runtime-performance"><span class="toc-section-number">6.1.4</span> Runtime performance</a></li>
 </ul></li>
-<li><a href="#simulated-input-data"><span class="toc-section-number">5.2</span> Simulated input data</a><ul>
-<li><a href="#number-of-hidden-nodes-v.s.-accuracy"><span class="toc-section-number">5.2.1</span> Number of hidden nodes v.s. accuracy</a></li>
-<li><a href="#number-of-pose-sources-v.s.-accuracy"><span class="toc-section-number">5.2.2</span> Number of pose sources v.s. accuracy</a></li>
+<li><a href="#simulated-input-data"><span class="toc-section-number">6.2</span> Simulated input data</a><ul>
+<li><a href="#number-of-hidden-nodes-v.s.-accuracy"><span class="toc-section-number">6.2.1</span> Number of hidden nodes v.s. accuracy</a></li>
+<li><a href="#number-of-pose-sources-v.s.-accuracy"><span class="toc-section-number">6.2.2</span> Number of pose sources v.s. accuracy</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#conclusion"><span class="toc-section-number">6</span> Conclusion</a></li>
+<li><a href="#conclusion"><span class="toc-section-number">7</span> Conclusion</a></li>
+<li><a href="#note"><span class="toc-section-number">8</span> Note</a></li>
 </ul>
 </nav>
-<p><a href="./beamer.pdf">Beamer</a></p>
 <hr />
-<h1 id="basic-information"><span class="header-section-number">1</span> Basic Information</h1>
-<h2 id="authors"><span class="header-section-number">1.1</span> Authors</h2>
+<h1 id="resources"><span class="header-section-number">1</span> Resources</h1>
+<ul>
+<li><p><a href="./paper.pdf">Paper</a></p></li>
+<li><p><a href="./beamer.pdf">Beamer</a></p></li>
+</ul>
+<hr />
+<h1 id="basic-information"><span class="header-section-number">2</span> Basic Information</h1>
+<h2 id="authors"><span class="header-section-number">2.1</span> Authors</h2>
 <ul>
 <li><p><strong>Christian Merfels</strong> is with Volkswagen Group Research, Wolfsburg, and Institute of Geodesy and Geoinformation, University of Bonn, Germany.</p></li>
 <li><p><strong>Cyrill Stachniss</strong> is with Institute of Geodesy and Geoinformation, University of Bonn, Germany.</p></li>
 </ul>
-<h2 id="conference"><span class="header-section-number">1.2</span> Conference</h2>
+<h2 id="conference"><span class="header-section-number">2.2</span> Conference</h2>
 <p>2016 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</p>
-<h2 id="abstract"><span class="header-section-number">1.3</span> Abstract</h2>
+<h2 id="abstract"><span class="header-section-number">2.3</span> Abstract</h2>
 <ul>
 <li><p>Combining multiple localization systems in a <strong>plug and play manner</strong>.</p></li>
 <li><p>Formulate this approach as a <strong>sliding window pose graph</strong>.</p></li>
 <li><p>The pose fusion approach scales from a filtering-based to a batch solution by increasing the size of the sliding window.</p></li>
 <li><p>The experiment runs at 20Hz on both simulated and real data.</p></li>
 </ul>
-<h2 id="keywords"><span class="header-section-number">1.4</span> Keywords</h2>
+<h2 id="keywords"><span class="header-section-number">2.4</span> Keywords</h2>
 <hr />
-<h1 id="introduction"><span class="header-section-number">2</span> Introduction</h1>
-<h2 id="problem-solution"><span class="header-section-number">2.1</span> Problem &amp; Solution</h2>
+<h1 id="introduction"><span class="header-section-number">3</span> Introduction</h1>
+<h2 id="problem-solution"><span class="header-section-number">3.1</span> Problem &amp; Solution</h2>
 <p>Individual localization system is not enough, and the combination of orthogonal localization systems is more powerful.</p>
-<h2 id="objective"><span class="header-section-number">2.2</span> Objective</h2>
+<h2 id="objective"><span class="header-section-number">3.2</span> Objective</h2>
 <p>This paper provides an approach to multi-sensor data fusion decouples the localization from the fusion task, which eneables the ability to incorporate third-party localization modules for which source code is unavailable.</p>
-<h2 id="formulation"><span class="header-section-number">2.3</span> Formulation</h2>
+<h2 id="formulation"><span class="header-section-number">3.3</span> Formulation</h2>
 <p>A coarse localization (red triangles), a precise but only temporary available localization (blue triangles), and odometry as dead reckoning trajectory (blue) are used to estimate the true trajectory (red) of a vehicle. The estimated poses are shown as black triangles: the goal is to approximate the unknown red line as closely as possible with the black triangles.</p>
 <p><img src="./img/posefusion.png" alt="image" width="566" /></p>
-<h2 id="contributions"><span class="header-section-number">2.4</span> Contributions</h2>
+<h2 id="contributions"><span class="header-section-number">3.4</span> Contributions</h2>
 <ul>
 <li><p>efficient sensor fusion of generic odometry and global pose inputs <span class="math inline">\(\Rightarrow\)</span> an intuitive architecture for pose estimation and timing issues.</p></li>
 <li><p>graph construction algorithm <span class="math inline">\(\Rightarrow\)</span> a sparse block-tridiagonal structure of the system matrix <span class="math inline">\(\Rightarrow\)</span> fast solution</p></li>
 </ul>
 <hr />
-<h1 id="related-work"><span class="header-section-number">3</span> Related Work</h1>
-<h2 id="multi-sensor-data-fusion-for-navigation-systems"><span class="header-section-number">3.1</span> Multi-sensor data fusion for navigation systems</h2>
+<h1 id="related-work"><span class="header-section-number">4</span> Related Work</h1>
+<h2 id="multi-sensor-data-fusion-for-navigation-systems"><span class="header-section-number">4.1</span> Multi-sensor data fusion for navigation systems</h2>
 <ul>
 <li><p><strong>filtering-based approaches</strong>: Kalman filter and its variants</p>
 <ul>
@@ -121,7 +128,7 @@
 <li><p>Some implementations keep the size of the graph bounded by simply discarding older nodes and edges, thus potentially obtaining overconfident estimates.</p></li>
 </ul></li>
 </ul>
-<h2 id="methodical-origin"><span class="header-section-number">3.2</span> Methodical origin</h2>
+<h2 id="methodical-origin"><span class="header-section-number">4.2</span> Methodical origin</h2>
 <ul>
 <li><p>Sibley et al.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, who are the first to introduce the concept of a slibing window filter in the context of robotics.</p></li>
 <li><p>Differences:</p>
@@ -132,19 +139,19 @@
 </ul></li>
 </ul>
 <hr />
-<h1 id="pose-graph-fusion"><span class="header-section-number">4</span> Pose Graph Fusion</h1>
-<h2 id="nonlinear-least-squares-problem"><span class="header-section-number">4.1</span> Nonlinear least squares problem</h2>
+<h1 id="method-pose-graph-fusion"><span class="header-section-number">5</span> Method: Pose Graph Fusion</h1>
+<h2 id="nonlinear-least-squares-problem"><span class="header-section-number">5.1</span> Nonlinear least squares problem</h2>
 <p>This paper exploits the state-of-the-art graph optimization framework g2o<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p>
 <p>The key idea is that given the state vector <span class="math inline">\(x=(x_1^T, ..., x_m^T)^T\)</span> and a set of measurements, where <span class="math inline">\(z_{ij}\)</span> is the mean and <span class="math inline">\(\Omega_{ij}\)</span> is the information matrix<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> of a single measurement relating <span class="math inline">\(x_i\)</span> to <span class="math inline">\(x_j\)</span>, least squares estimation seeks the state <span class="math display">\[x^*=\arg\min_x{\sum_{i,j}e_{ij}^T\Omega_{ij}e_{ij}}
 \label{eq:state}\]</span> that best explains all measurements given the <span class="math inline">\(\mathit{l}_2\)</span> norm. The vector error function <span class="math inline">\(e_{ij}=e(x_i,x_j,z_{ij})\)</span> measures how well the constraint from the measurement <span class="math inline">\(z_{ij}\)</span> is satisfied. Solving <span class="math inline">\((\ref{eq:state})\)</span> requires iteratively solving a linear system with the system matrix<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> <span class="math inline">\(H\)</span> and the right-hand side vector <span class="math inline">\(b\)</span> such that <span class="math display">\[H=\sum_{i,j}{J_{ij}(x)^T\Omega_{ij}J_{ij}(x)}\]</span> <span class="math display">\[b^T=\sum_{i,j}e_{ij}^T\Omega_{ij}J_{ij}(x)\]</span> where <span class="math inline">\(J_{ij}(x)\)</span> refers to the Jacobian<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> of the error function computed in state <span class="math inline">\(x\)</span>.</p>
-<h2 id="sliding-window-chain-pose-graph-fusion"><span class="header-section-number">4.2</span> Sliding window chain pose graph fusion</h2>
-<h3 id="about-the-online-state-estimation-system"><span class="header-section-number">4.2.1</span> About the online state estimation system</h3>
+<h2 id="sliding-window-chain-pose-graph-fusion"><span class="header-section-number">5.2</span> Sliding window chain pose graph fusion</h2>
+<h3 id="about-the-online-state-estimation-system"><span class="header-section-number">5.2.1</span> About the online state estimation system</h3>
 <ul>
 <li><p>general nonlinear least squares estimation taks into account all available information within the full pose graph</p></li>
 <li><p>to keep the problem computationally tractable, it is necessary to limit the considered information.</p></li>
 <li><p>this approach achieves this by marginalizing out prior state state variables and the state vector <span class="math inline">\(x\)</span> in a sliding window pose graph is reduced to the M most recent states <span class="math inline">\(x=(x_{t-M+1}^T,...,x_t^T)^T\)</span>.</p></li>
 </ul>
-<h3 id="about-the-graph-structure"><span class="header-section-number">4.2.2</span> About the graph structure</h3>
+<h3 id="about-the-graph-structure"><span class="header-section-number">5.2.2</span> About the graph structure</h3>
 <ul>
 <li><p>global pose source: measure poses within a global coordinate system, e.g. Universal Transverse Mercator (UTM) coordinate</p></li>
 <li><p>local pose source: measure spatial transformations relative to the previous pose, e.g. odometry</p></li>
@@ -154,7 +161,7 @@
 <li><p>The resulting form or the graph is called <strong>chain pose graph</strong>.</p></li>
 </ul>
 <p><img src="./img/posegraph.png" alt="image" width="566" /></p>
-<h3 id="about-the-algorithm-working-frequency"><span class="header-section-number">4.2.3</span> About the algorithm working frequency</h3>
+<h3 id="about-the-algorithm-working-frequency"><span class="header-section-number">5.2.3</span> About the algorithm working frequency</h3>
 <ul>
 <li><p>Related graph-based approaches.</p>
 <ul>
@@ -168,14 +175,14 @@
 <li><p>enforce a certain matrix structure for H, to include all measurement sources in a generic way independetly of their specific output frequencies, and to a priori relate the number of state variables to the length of the interval of the sliding window.</p></li>
 </ul></li>
 </ul>
-<h3 id="about-the-system-matrix-h"><span class="header-section-number">4.2.4</span> About the system matrix <span class="math inline">\(H\)</span></h3>
+<h3 id="about-the-system-matrix-h"><span class="header-section-number">5.2.4</span> About the system matrix <span class="math inline">\(H\)</span></h3>
 <ul>
 <li><p>The block-tridiagonal structure is a consequence of the linear temporal ordering of the state variables combined with the fact that edges are at most constructed between successive nodes.</p></li>
 <li><p>This structure does not produce fill-in in system matrix <span class="math inline">\(H\)</span> after marginalization of the oldest state variables.</p></li>
 <li><p>Beyond that, even the Cholesky factorization<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a> <span class="math inline">\(H=R^TR\)</span>, which this paper perform to solve the linear system, does not suffer from fill-in in its triangular matrix <span class="math inline">\(R\)</span> (becomes a band matrix).</p></li>
 <li><p>The computational complexity of this approach is efficiently solvable in <span class="math inline">\(\mathcal{O}(n)\)</span>.</p></li>
 </ul>
-<h2 id="time-behavior"><span class="header-section-number">4.3</span> Time behavior</h2>
+<h2 id="time-behavior"><span class="header-section-number">5.3</span> Time behavior</h2>
 <ul>
 <li><p>Define time behavior as the latency, frequency, and availability of estimate. The output of the PoseGraphFusion is time-triggered.</p></li>
 <li><p>Difficulties:</p>
@@ -199,7 +206,7 @@
 <p><img src="./img/timebehavior.png" alt="image" width="377" /></p></li>
 <li><p>The backward-forward computations problem of conventional Kalman filtering approaches: to integrate a new measurement, it has to propagate its state back in time to the time of the measurement, apply the measurement, and re-apply all other stored measurements.</p></li>
 </ul>
-<h2 id="marginalization-in-the-form-of-a-prior-node"><span class="header-section-number">4.4</span> Marginalization in the form of a prior node</h2>
+<h2 id="marginalization-in-the-form-of-a-prior-node"><span class="header-section-number">5.4</span> Marginalization in the form of a prior node</h2>
 <ul>
 <li><p>Motivation: limit the amount of hidden nodes to maintain constant runtime complexity.</p></li>
 <li><p>Problem: Simply removing edges and nodes leads to information loss and is equivalent to conditioning, which potentially leads to overconfidence.</p></li>
@@ -216,10 +223,10 @@
 <li><p>it opens up the possibility to explicitly apply a robust kernel on the cost function of the prior node and to adjust the uncertainty of the prior information based on context.</p></li>
 </ul></li>
 </ul>
-<h3 id="effect-of-the-schur-complement-on-chain-pose-graphs"><span class="header-section-number">4.4.1</span> Effect of the Schur complement on chain pose graphs</h3>
-<h3 id="derivation-of-the-prior-node"><span class="header-section-number">4.4.2</span> Derivation of the prior node</h3>
+<h3 id="effect-of-the-schur-complement-on-chain-pose-graphs"><span class="header-section-number">5.4.1</span> Effect of the Schur complement on chain pose graphs</h3>
+<h3 id="derivation-of-the-prior-node"><span class="header-section-number">5.4.2</span> Derivation of the prior node</h3>
 <p>*** Still working on the mathematical details... (planned 11/11) ***</p>
-<h2 id="assessing-the-uncertainty-of-the-fused-estimate"><span class="header-section-number">4.5</span> Assessing the uncertainty of the fused estimate</h2>
+<h2 id="assessing-the-uncertainty-of-the-fused-estimate"><span class="header-section-number">5.5</span> Assessing the uncertainty of the fused estimate</h2>
 <p>The optimization assigns to the hidden nodes the global poses which best satisfy all constraints. Solving the nonlinear least squares problem of the pose fusion with a sparse solver typically involves computing the Cholesky factorization <span class="math inline">\(H=R^TR\)</span>, where <span class="math inline">\(R\)</span> is an upper triangular matrix with entries <span class="math inline">\(r_ij\)</span>. Following the referred paper [13]<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>, the uncertainty matrix of the hidden nodes <span class="math inline">\(H^{-1}\)</span> with entries <span class="math inline">\(H_{ij}^{-1}\)</span> is obtained by the recursive formula: <span class="math display">\[\begin{array}{rcl}
 H_{ii}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[\frac{1}{r_{ii}}-\sum_{\begin{array}{c}
     k=i+1 \\
@@ -233,7 +240,7 @@ H_{ij}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[-\sum_{\begin{array}{c}
     r_{ik} \neq 0 \\
     \end{array}}^{n}{r_{ik}H_{jk}^{-1}}\right]
 \end{array}\]</span> The formula yields an <span class="math inline">\(\mathbb{O}(n)\)</span> time complexity with <span class="math inline">\(n\)</span> being the number of state variables. It becomes constant time for sliding window pose graphs as the number of state variables is upper bounded by a constant value.</p>
-<h2 id="noise-correlations-between-input-sources"><span class="header-section-number">4.6</span> Noise correlations between input sources</h2>
+<h2 id="noise-correlations-between-input-sources"><span class="header-section-number">5.6</span> Noise correlations between input sources</h2>
 <ul>
 <li><p>This method needs to apply appropriate preprocessing (covariance intersection<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>) if noise is correlated between input sources:</p>
 <ul>
@@ -242,10 +249,10 @@ H_{ij}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[-\sum_{\begin{array}{c}
 </ul></li>
 <li><p>Combine groups of sources with correlated noise into a single consistent estimate.</p></li>
 </ul>
-<h1 id="evaluation"><span class="header-section-number">5</span> Evaluation</h1>
+<h1 id="evaluation"><span class="header-section-number">6</span> Evaluation</h1>
 <p>Baseline: the online ML (maximum likelihood) estimate, scaling from a filtering to a batch least squares solution.</p>
-<h2 id="experiment-on-a-real-prototype-vehicle"><span class="header-section-number">5.1</span> Experiment on a real prototype vehicle</h2>
-<h3 id="settings"><span class="header-section-number">5.1.1</span> Settings</h3>
+<h2 id="experiment-on-a-real-prototype-vehicle"><span class="header-section-number">6.1</span> Experiment on a real prototype vehicle</h2>
+<h3 id="settings"><span class="header-section-number">6.1.1</span> Settings</h3>
 <ul>
 <li><p>global sources:</p>
 <ul>
@@ -258,7 +265,7 @@ H_{ij}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[-\sum_{\begin{array}{c}
 <li><p>temporal resolution: <span class="math inline">\(\Delta t=25ms\)</span></p></li>
 <li><p>experiment route: <span class="math inline">\(16km\)</span> in rural and urban areas in Germany.</p></li>
 </ul>
-<h3 id="pose-estimate-quality"><span class="header-section-number">5.1.2</span> Pose estimate quality</h3>
+<h3 id="pose-estimate-quality"><span class="header-section-number">6.1.2</span> Pose estimate quality</h3>
 <p>Baseline: batch solution.<br />
 Noises are not independently distributed with zero mean and the uncertainty models are unknown.</p>
 <ul>
@@ -268,7 +275,7 @@ Noises are not independently distributed with zero mean and the uncertainty mode
 <li><p>PoseGraphFusion: <span class="math inline">\(RMS=0.38m\)</span></p></li>
 </ul>
 <p><img src="./img/error.png" alt="image" width="377" /></p>
-<h3 id="latency-and-availability"><span class="header-section-number">5.1.3</span> Latency and availability</h3>
+<h3 id="latency-and-availability"><span class="header-section-number">6.1.3</span> Latency and availability</h3>
 <p>Latency: <span class="math inline">\(\leq 10ms\)</span>.<br />
 Availability:</p>
 <ul>
@@ -277,22 +284,24 @@ Availability:</p>
 <li><p>source 2: <span class="math inline">\(97.76\%\)</span></p></li>
 <li><p>PoseGraphFusion: <span class="math inline">\(100\%\)</span></p></li>
 </ul>
-<h3 id="runtime-performance"><span class="header-section-number">5.1.4</span> Runtime performance</h3>
+<h3 id="runtime-performance"><span class="header-section-number">6.1.4</span> Runtime performance</h3>
 <p>a single core of a laptop with an Intel i7-4800QM processor</p>
 <p><img src="./img/runtime.png" alt="image" width="321" /> <img src="./img/relationship.png" alt="image" width="321" /></p>
-<h2 id="simulated-input-data"><span class="header-section-number">5.2</span> Simulated input data</h2>
-<h3 id="number-of-hidden-nodes-v.s.-accuracy"><span class="header-section-number">5.2.1</span> Number of hidden nodes v.s. accuracy</h3>
+<h2 id="simulated-input-data"><span class="header-section-number">6.2</span> Simulated input data</h2>
+<h3 id="number-of-hidden-nodes-v.s.-accuracy"><span class="header-section-number">6.2.1</span> Number of hidden nodes v.s. accuracy</h3>
 <p>Larger sliding window size <span class="math inline">\(\Rightarrow\)</span> more accurate result</p>
 <p><img src="./img/accuracy.png" alt="image" width="377" /></p>
-<h3 id="number-of-pose-sources-v.s.-accuracy"><span class="header-section-number">5.2.2</span> Number of pose sources v.s. accuracy</h3>
+<h3 id="number-of-pose-sources-v.s.-accuracy"><span class="header-section-number">6.2.2</span> Number of pose sources v.s. accuracy</h3>
 <p>More pose sources <span class="math inline">\(\Rightarrow\)</span> more accurate result</p>
 <p><img src="./img/sources.png" alt="image" width="377" /></p>
-<h1 id="conclusion"><span class="header-section-number">6</span> Conclusion</h1>
+<h1 id="conclusion"><span class="header-section-number">7</span> Conclusion</h1>
 <ul>
 <li><p>Motivation: the need for fast, recent, accurate, and highly available pose estimates.</p></li>
 <li><p>Method: a sliding window graph-based optimization scheme.</p></li>
 <li><p>The design of chain pose graphs for efficient optimization.</p></li>
 </ul>
+<hr />
+<h1 id="note"><span class="header-section-number">8</span> Note</h1>
 <section class="footnotes">
 <hr />
 <ol>

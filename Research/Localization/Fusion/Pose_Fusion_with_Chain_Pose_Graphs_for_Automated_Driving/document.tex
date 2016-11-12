@@ -1,4 +1,4 @@
-\documentclass[letterpaper,11pt]{article}
+\documentclass[letterpaper,10pt]{article}
 \usepackage[margin=2cm]{geometry}
 
 \usepackage{graphicx}
@@ -8,16 +8,21 @@
 \usepackage[colorlinks]{hyperref}
 
 \title{\textbf{Pose Fusion with Chain Pose Graphs for Automated Driving}}
-\author{HMW-Alexander}
+\author{Christian Merfels, Cyrill Stachniss}
 
 \begin{document}
 	
 \maketitle
 
 \tableofcontents
-\newpage
 
-\href{./beamer.pdf}{Beamer}
+\begin{center}\rule{\textwidth}{1pt}\end{center}
+\section{Resources}
+
+\begin{itemize}
+	\item \href{./paper.pdf}{Paper}
+	\item \href{./beamer.pdf}{Beamer}
+\end{itemize}
 
 \begin{center}\rule{\textwidth}{1pt}\end{center}
 \section{Basic Information}
@@ -103,7 +108,7 @@ A coarse localization (red triangles), a precise but only temporary available lo
 \end{itemize}
 
 \begin{center}\rule{\textwidth}{1pt}\end{center}
-\section{Pose Graph Fusion}
+\section{Method: Pose Graph Fusion}
 
 \subsection{Nonlinear least squares problem}
 
@@ -332,5 +337,8 @@ More pose sources $\Rightarrow$ more accurate result
 	\item Method: a sliding window graph-based optimization scheme.
 	\item The design of chain pose graphs for efficient optimization.
 \end{itemize}
+
+\begin{center}\rule{\textwidth}{1pt}\end{center}
+\section{Note}
 
 \end{document}
