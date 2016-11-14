@@ -7,6 +7,9 @@
 \usepackage{amssymb}
 \usepackage[colorlinks]{hyperref}
 
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.5em}
+
 \title{\textbf{Pose Fusion with Chain Pose Graphs for Automated Driving}}
 \author{Christian Merfels, Cyrill Stachniss}
 
@@ -114,7 +117,7 @@ A coarse localization (red triangles), a precise but only temporary available lo
 
 This paper exploits the state-of-the-art graph optimization framework g2o\footnote{R. K¨ ummerle, G. Grisetti, H. Strasdat, K. Konolige, and W. Burgard, ``g2o: A General Framework for Graph Optimization," in Proc. IEEE Int. Conf. Robotics and Automation (ICRA), 2011, pp. 3607–3613.}.
 
-The key idea is that given the state vector $x=(x_1^T, ..., x_m^T)^T$ and a set of measurements, where $z_{ij}$ is the mean and $\Omega_{ij}$ is the information matrix\footnote{\url{https://en.wikipedia.org/wiki/Fisher_information}} of a single measurement relating $x_i$ to $x_j$, least squares estimation seeks the state
+The key idea is that given the state vector $x=(x_1^T, ..., x_m^T)^T$ and a set of measurements, where $z_{ij}$ is the mean and $\Omega_{ij}$ is the information matrix\footnote{$\Omega=\Sigma^{-1}$, $b=\Omega \mu$} of a single measurement relating $x_i$ to $x_j$, least squares estimation seeks the state
 \begin{equation}
 x^*=\arg\min_x{\sum_{i,j}e_{ij}^T\Omega_{ij}e_{ij}}
 \label{eq:state}
@@ -225,12 +228,119 @@ where $J_{ij}(x)$ refers to the Jacobian\footnote{\url{https://en.wikipedia.org/
 
 \subsubsection{Effect of the Schur complement on chain pose graphs}
 
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=10cm]{./img/schur.png}
+\end{figure}
 
+\begin{equation}
+H^{small} \Delta x^{small} =\left[\begin{array}{cc}
+H_{bb}^{small} & H_{bc}^{small} \\
+H_{cb}^{small} & H_{cc}^{small} \\
+\end{array}\right] \Delta x^{small} = - \left[\begin{array}{c}
+b_{b}^{small} \\
+b_{c}^{small} \\
+\end{array}\right]
+\end{equation}
+
+\begin{equation}
+\begin{array}{rcl}
+H^{full} \Delta x^{full} & = & \left[\begin{array}{ccc}
+\bar{H}_{aa} + \hat{H}_{aa} & \hat{H}_{ab} & 0 \\
+\hat{H}_{ba} & H_{bb}^{small} + \hat{H}_{bb} & H_{bc}^{small} \\
+0 & H_{cb}^{small} & H_{cc}^{small} \\
+\end{array}\right] \Delta x^{full} \\
+
+& = & \left(\left[\begin{array}{ccc}
+0 & 0 & 0 \\
+0 & H_{bb}^{small} & H_{bc}^{small} \\
+0 & H_{cb}^{small} & H_{cc}^{small} \\
+\end{array}\right]+\left[\begin{array}{ccc}
+\bar{H}_{aa} + \hat{H}_{aa} & \hat{H}_{ab} & 0 \\
+\hat{H}_{ba} & \hat{H}_{bb} & 0 \\
+0 & 0 & 0 \\
+\end{array}\right]\right) \Delta x^{full} \\
+
+& = & -\left[\begin{array}{c}
+0 \\
+b_b^{small} \\
+b_c^{small} \\
+\end{array}\right] - \left[\begin{array}{c}
+\bar{b}_a+\hat{b}_a \\
+\hat{b}_b \\
+0 \\
+\end{array}\right] = -\left[\begin{array}{c}
+\bar{b}_a + \hat{b}_a \\
+b_b^{small} + \hat{b}_b \\
+b_c^{small} \\
+\end{array}\right]\\ 
+\end{array}
+\end{equation}
+
+Use Schur complement of $H^{full}$ and $b^{full}$ to marginalize $x_a$ \footnote{$\hat{H}_{ab}\Delta x_b=(\bar{b}_a+\hat{b}_a)-(\bar{H}_{aa}+\hat{H}_aa)\Delta x_a,\text{~where~}\Delta x_a=0$}
+\begin{equation}
+\begin{array}{rcl}
+\left[\begin{array}{cc}
+\bar{H}_{aa} + \hat{H}_{aa} & \hat{H}_{ab} \\
+\hat{H}_{ba} & \hat{H}_{bb} \\
+\end{array}\right] & \Rightarrow & H^{schur}=\hat{H}_{bb}-\hat{H}_{ba}(\bar{H}_{aa}+\hat{H}_{aa})^{-1}\hat{H}_{ab} \\
+b^{schur}=H^{schur}\Delta x_b & = & \hat{b}_b - \hat{H}_{ba}(\bar{H}_{aa}+\hat{H}_{aa})^{-1}(\bar{b}_a+\hat{b}_a) \\
+\end{array}
+\end{equation}
+
+The marginalized system matrix $H^{marg}$ and coefficient vector $b^{marg}$
+\begin{equation}
+\begin{array}{rcl}
+H^{marg} & = & \left[\begin{array}{cc}
+H_{bb}^{small} + H^{schur} & H_{bc}^{small} \\
+H_{cb}^{small} & H_{cc}^{small} \\
+\end{array}\right] \\
+b^{marg} & = & \left[\begin{array}{c}
+b_b^{small} + b^{schur} \\
+b_c^{small} \\
+\end{array}\right]
+\end{array}
+\end{equation}
+
+After the marginalization, the structure of the system matrix is still block-tridiagonal due to the particular design of the chain pose graph, meaning that the sparsity pattern of $H$ is retained after marginalization without fill-in.
 
 \subsubsection{Derivation of the prior node}
-***
-Still working on the mathematical details... (planned 11/11)
-***
+A different marginalization method to replace $x_a$ and its connected observed nodes and edges with a prior node $\bar{x}_p$ (will be a measurement). The result is same, but the marginalized nodes can be visualized as an observed node.
+\begin{equation}
+\begin{array}{rcl}
+H^{prior} & = & \left[\begin{array}{cc}
+H_{bb}^{small} + \bar{H}^{prior} & H_{bc}^{small} \\
+H_{cb}^{small} & H_{cc}^{small} \\
+\end{array}\right] \\
+b^{prior} & = & \left[\begin{array}{c}
+b_b^{small} + \bar{b}^{prior} \\
+b_c^{small} \\
+\end{array}\right]
+\end{array}
+\end{equation}
+The $x_p$ can be defined as the mean estimate of any observed node of $x_b$. Then define the error function $e_{pb}$ and consequently its Jacobian $J_{pb}(x)$.
+\begin{equation}
+\begin{array}{rcl}
+e_{pb} & = & \left[\begin{array}{cc}
+R & 0 \\
+0 & 1 \\
+\end{array}\right] (x_b-\bar{x}_p) \\
+J_{pb}(x) & = & \left[\begin{array}{cc}
+R & 0 \\
+0 & 1 \\
+\end{array}\right]
+\end{array}
+\end{equation}
+
+Therefore
+\begin{equation}
+\begin{array}{rcl}
+\bar{H}_p & = & J_{pb}(x)^T \bar{\Omega}_p J_{pb}(x) = H^{schur}\\
+\Rightarrow \bar{\Omega}_p & = & (J_{pb}(x)^T)^{-1} H^{schur} (J_{pb}(x))^{-1} \\
+\bar{b}_p & = & J_{pb}(x)^T \bar{\Omega}_p e_{pb} = J_{pb}(x)^T \bar{\Omega}_p J_{pb}(x) (x_b-\bar{x}_p) = \bar{H}_p(x_b-\bar{x}_p) \\
+\Rightarrow \bar{x}_p & = & x_b-(H^{schur})^-1 b^{schur} \\
+\end{array}
+\end{equation}
 
 \subsection{Assessing the uncertainty of the fused estimate}
 

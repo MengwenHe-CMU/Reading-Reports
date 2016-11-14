@@ -224,10 +224,91 @@
 </ul></li>
 </ul>
 <h3 id="effect-of-the-schur-complement-on-chain-pose-graphs"><span class="header-section-number">5.4.1</span> Effect of the Schur complement on chain pose graphs</h3>
+<p><img src="./img/schur.png" alt="image" width="377" /></p>
+<p><span class="math display">\[H^{small} \Delta x^{small} =\left[\begin{array}{cc}
+H_{bb}^{small} &amp; H_{bc}^{small} \\
+H_{cb}^{small} &amp; H_{cc}^{small} \\
+\end{array}\right] \Delta x^{small} = - \left[\begin{array}{c}
+b_{b}^{small} \\
+b_{c}^{small} \\
+\end{array}\right]\]</span></p>
+<p><span class="math display">\[\begin{array}{rcl}
+H^{full} \Delta x^{full} &amp; = &amp; \left[\begin{array}{ccc}
+\bar{H}_{aa} + \hat{H}_{aa} &amp; \hat{H}_{ab} &amp; 0 \\
+\hat{H}_{ba} &amp; H_{bb}^{small} + \hat{H}_{bb} &amp; H_{bc}^{small} \\
+0 &amp; H_{cb}^{small} &amp; H_{cc}^{small} \\
+\end{array}\right] \Delta x^{full} \\
+
+&amp; = &amp; \left(\left[\begin{array}{ccc}
+0 &amp; 0 &amp; 0 \\
+0 &amp; H_{bb}^{small} &amp; H_{bc}^{small} \\
+0 &amp; H_{cb}^{small} &amp; H_{cc}^{small} \\
+\end{array}\right]+\left[\begin{array}{ccc}
+\bar{H}_{aa} + \hat{H}_{aa} &amp; \hat{H}_{ab} &amp; 0 \\
+\hat{H}_{ba} &amp; \hat{H}_{bb} &amp; 0 \\
+0 &amp; 0 &amp; 0 \\
+\end{array}\right]\right) \Delta x^{full} \\
+
+&amp; = &amp; -\left[\begin{array}{c}
+0 \\
+b_b^{small} \\
+b_c^{small} \\
+\end{array}\right] - \left[\begin{array}{c}
+\bar{b}_a+\hat{b}_a \\
+\hat{b}_b \\
+0 \\
+\end{array}\right] = -\left[\begin{array}{c}
+\bar{b}_a + \hat{b}_a \\
+b_b^{small} + \hat{b}_b \\
+b_c^{small} \\
+\end{array}\right]\\ 
+\end{array}\]</span></p>
+<p>Use Schur complement of <span class="math inline">\(H^{full}\)</span> and <span class="math inline">\(b^{full}\)</span> to marginalize <span class="math inline">\(x_a\)</span> <a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> <span class="math display">\[\begin{array}{rcl}
+\left[\begin{array}{cc}
+\bar{H}_{aa} + \hat{H}_{aa} &amp; \hat{H}_{ab} \\
+\hat{H}_{ba} &amp; \hat{H}_{bb} \\
+\end{array}\right] &amp; \Rightarrow &amp; H^{schur}=\hat{H}_{bb}-\hat{H}_{ba}(\bar{H}_{aa}+\hat{H}_{aa})^{-1}\hat{H}_{ab} \\
+b^{schur}=H^{schur}\Delta x_b &amp; = &amp; \hat{b}_b - \hat{H}_{ba}(\bar{H}_{aa}+\hat{H}_{aa})^{-1}(\bar{b}_a+\hat{b}_a) \\
+\end{array}\]</span></p>
+<p>The marginalized system matrix <span class="math inline">\(H^{marg}\)</span> and coefficient vector <span class="math inline">\(b^{marg}\)</span> <span class="math display">\[\begin{array}{rcl}
+H^{marg} &amp; = &amp; \left[\begin{array}{cc}
+H_{bb}^{small} + H^{schur} &amp; H_{bc}^{small} \\
+H_{cb}^{small} &amp; H_{cc}^{small} \\
+\end{array}\right] \\
+b^{marg} &amp; = &amp; \left[\begin{array}{c}
+b_b^{small} + b^{schur} \\
+b_c^{small} \\
+\end{array}\right]
+\end{array}\]</span></p>
+<p>After the marginalization, the structure of the system matrix is still block-tridiagonal due to the particular design of the chain pose graph, meaning that the sparsity pattern of <span class="math inline">\(H\)</span> is retained after marginalization without fill-in.</p>
 <h3 id="derivation-of-the-prior-node"><span class="header-section-number">5.4.2</span> Derivation of the prior node</h3>
-<p>*** Still working on the mathematical details... (planned 11/11) ***</p>
+<p>A different marginalization method to replace <span class="math inline">\(x_a\)</span> and its connected observed nodes and edges with a prior node <span class="math inline">\(\bar{x}_p\)</span> (will be a measurement). The result is same, but the marginalized nodes can be visualized as an observed node. <span class="math display">\[\begin{array}{rcl}
+H^{prior} &amp; = &amp; \left[\begin{array}{cc}
+H_{bb}^{small} + \bar{H}^{prior} &amp; H_{bc}^{small} \\
+H_{cb}^{small} &amp; H_{cc}^{small} \\
+\end{array}\right] \\
+b^{prior} &amp; = &amp; \left[\begin{array}{c}
+b_b^{small} + \bar{b}^{prior} \\
+b_c^{small} \\
+\end{array}\right]
+\end{array}\]</span> The <span class="math inline">\(x_p\)</span> can be defined as the mean estimate of any observed node of <span class="math inline">\(x_b\)</span>. Then define the error function <span class="math inline">\(e_{pb}\)</span> and consequently its Jacobian <span class="math inline">\(J_{pb}(x)\)</span>. <span class="math display">\[\begin{array}{rcl}
+e_{pb} &amp; = &amp; \left[\begin{array}{cc}
+R &amp; 0 \\
+0 &amp; 1 \\
+\end{array}\right] (x_b-\bar{x}_p) \\
+J_{pb}(x) &amp; = &amp; \left[\begin{array}{cc}
+R &amp; 0 \\
+0 &amp; 1 \\
+\end{array}\right]
+\end{array}\]</span></p>
+<p>Therefore <span class="math display">\[\begin{array}{rcl}
+\bar{H}_p &amp; = &amp; J_{pb}(x)^T \bar{\Omega}_p J_{pb}(x) = H^{schur}\\
+\Rightarrow \bar{\Omega}_p &amp; = &amp; (J_{pb}(x)^T)^{-1} H^{schur} (J_{pb}(x))^{-1} \\
+\bar{b}_p &amp; = &amp; J_{pb}(x)^T \bar{\Omega}_p e_{pb} = J_{pb}(x)^T \bar{\Omega}_p J_{pb}(x) (x_b-\bar{x}_p) = \bar{H}_p(x_b-\bar{x}_p) \\
+\Rightarrow \bar{x}_p &amp; = &amp; x_b-(H^{schur})^-1 b^{schur} \\
+\end{array}\]</span></p>
 <h2 id="assessing-the-uncertainty-of-the-fused-estimate"><span class="header-section-number">5.5</span> Assessing the uncertainty of the fused estimate</h2>
-<p>The optimization assigns to the hidden nodes the global poses which best satisfy all constraints. Solving the nonlinear least squares problem of the pose fusion with a sparse solver typically involves computing the Cholesky factorization <span class="math inline">\(H=R^TR\)</span>, where <span class="math inline">\(R\)</span> is an upper triangular matrix with entries <span class="math inline">\(r_ij\)</span>. Following the referred paper [13]<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>, the uncertainty matrix of the hidden nodes <span class="math inline">\(H^{-1}\)</span> with entries <span class="math inline">\(H_{ij}^{-1}\)</span> is obtained by the recursive formula: <span class="math display">\[\begin{array}{rcl}
+<p>The optimization assigns to the hidden nodes the global poses which best satisfy all constraints. Solving the nonlinear least squares problem of the pose fusion with a sparse solver typically involves computing the Cholesky factorization <span class="math inline">\(H=R^TR\)</span>, where <span class="math inline">\(R\)</span> is an upper triangular matrix with entries <span class="math inline">\(r_ij\)</span>. Following the referred paper [13]<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>, the uncertainty matrix of the hidden nodes <span class="math inline">\(H^{-1}\)</span> with entries <span class="math inline">\(H_{ij}^{-1}\)</span> is obtained by the recursive formula: <span class="math display">\[\begin{array}{rcl}
 H_{ii}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[\frac{1}{r_{ii}}-\sum_{\begin{array}{c}
     k=i+1 \\
     r_{ik} \neq 0 \\
@@ -242,7 +323,7 @@ H_{ij}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[-\sum_{\begin{array}{c}
 \end{array}\]</span> The formula yields an <span class="math inline">\(\mathbb{O}(n)\)</span> time complexity with <span class="math inline">\(n\)</span> being the number of state variables. It becomes constant time for sliding window pose graphs as the number of state variables is upper bounded by a constant value.</p>
 <h2 id="noise-correlations-between-input-sources"><span class="header-section-number">5.6</span> Noise correlations between input sources</h2>
 <ul>
-<li><p>This method needs to apply appropriate preprocessing (covariance intersection<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>) if noise is correlated between input sources:</p>
+<li><p>This method needs to apply appropriate preprocessing (covariance intersection<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a>) if noise is correlated between input sources:</p>
 <ul>
 <li><p>different input source build up on the same sensor data</p></li>
 <li><p>the same algorithm runs on two physically different sensors.</p></li>
@@ -308,13 +389,14 @@ Availability:</p>
 <li id="fn1"><p>M. Kaess, H. Johannsson, R. Roberts, V. Ila, J. Leonard, and F. Del- laert, “iSAM2: Incremental Smoothing and Mapping using the Bayes tree,&quot; Int. Journal of Robotics Research, pp. 216–235, 2012.<a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p>G. Sibley, L. Matthies, and G. Sukhatme, “SlidingWindow Filter with Application to Planetary Landing,&quot; Journal of Field Robotics, vol. 27, no. 5, pp. 587–608, 2010<a href="#fnref2">↩</a></p></li>
 <li id="fn3"><p>R. K¨ ummerle, G. Grisetti, H. Strasdat, K. Konolige, and W. Burgard, “g2o: A General Framework for Graph Optimization,&quot; in Proc. IEEE Int. Conf. Robotics and Automation (ICRA), 2011, pp. 3607–3613.<a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p><a href="https://en.wikipedia.org/wiki/Fisher_information" class="uri">https://en.wikipedia.org/wiki/Fisher_information</a><a href="#fnref4">↩</a></p></li>
+<li id="fn4"><p><span class="math inline">\(\Omega=\Sigma^{-1}\)</span>, <span class="math inline">\(b=\Omega \mu\)</span><a href="#fnref4">↩</a></p></li>
 <li id="fn5"><p><a href="https://en.wikipedia.org/wiki/State-space_representation" class="uri">https://en.wikipedia.org/wiki/State-space_representation</a><a href="#fnref5">↩</a></p></li>
 <li id="fn6"><p><a href="https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant" class="uri">https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant</a><a href="#fnref6">↩</a></p></li>
 <li id="fn7"><p><a href="https://en.wikipedia.org/wiki/Cholesky_decomposition" class="uri">https://en.wikipedia.org/wiki/Cholesky_decomposition</a><a href="#fnref7">↩</a></p></li>
 <li id="fn8"><p><a href="https://en.wikipedia.org/wiki/Schur_complement" class="uri">https://en.wikipedia.org/wiki/Schur_complement</a><a href="#fnref8">↩</a></p></li>
-<li id="fn9"><p>M. Kaess and F. Dellaert, “Covariance Recovery from a Square Root Information Matrix for Data Association,&quot; Robotics and Autonomous Systems, pp. 1198–1210, 2009.<a href="#fnref9">↩</a></p></li>
-<li id="fn10"><p>S. J. Julier and J. K. Uhlmann, “A non-divergent estimation algorithm in the presence of unknown correlations,&quot; in Proc. Amer. Control Conf. (ACC), 1997, pp. 2369–2373.<a href="#fnref10">↩</a></p></li>
+<li id="fn9"><p><span class="math inline">\(\hat{H}_{ab}\Delta x_b=(\bar{b}_a+\hat{b}_a)-(\bar{H}_{aa}+\hat{H}_aa)\Delta x_a,\text{~where~}\Delta x_a=0\)</span><a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p>M. Kaess and F. Dellaert, “Covariance Recovery from a Square Root Information Matrix for Data Association,&quot; Robotics and Autonomous Systems, pp. 1198–1210, 2009.<a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>S. J. Julier and J. K. Uhlmann, “A non-divergent estimation algorithm in the presence of unknown correlations,&quot; in Proc. Amer. Control Conf. (ACC), 1997, pp. 2369–2373.<a href="#fnref11">↩</a></p></li>
 </ol>
 </section>
 </body>
