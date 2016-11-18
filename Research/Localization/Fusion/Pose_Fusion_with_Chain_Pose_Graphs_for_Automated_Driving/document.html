@@ -4,13 +4,12 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="author" content="Christian Merfels, Cyrill Stachniss">
   <title>Pose Fusion with Chain Pose Graphs for Automated Driving</title>
   <style type="text/css">code{white-space: pre;}</style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
   <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
   <script type="text/x-mathjax-config">
   	MathJax.Hub.Config({
   		TeX: {
@@ -22,7 +21,6 @@
 <body>
 <header>
 <h1 class="title"><strong>Pose Fusion with Chain Pose Graphs for Automated Driving</strong></h1>
-<h2 class="author">Christian Merfels, Cyrill Stachniss</h2>
 </header>
 <nav id="TOC">
 <ul>
@@ -49,7 +47,7 @@
 <li><a href="#about-the-online-state-estimation-system"><span class="toc-section-number">5.2.1</span> About the online state estimation system</a></li>
 <li><a href="#about-the-graph-structure"><span class="toc-section-number">5.2.2</span> About the graph structure</a></li>
 <li><a href="#about-the-algorithm-working-frequency"><span class="toc-section-number">5.2.3</span> About the algorithm working frequency</a></li>
-<li><a href="#about-the-system-matrix-h"><span class="toc-section-number">5.2.4</span> About the system matrix <span class="math inline">\(H\)</span></a></li>
+<li><a href="#about-the-system-matrix-h"><span class="toc-section-number">5.2.4</span> About the system matrix <span class="math">\(H\)</span></a></li>
 </ul></li>
 <li><a href="#time-behavior"><span class="toc-section-number">5.3</span> Time behavior</a></li>
 <li><a href="#marginalization-in-the-form-of-a-prior-node"><span class="toc-section-number">5.4</span> Marginalization in the form of a prior node</a><ul>
@@ -76,45 +74,45 @@
 </ul>
 </nav>
 <hr />
-<h1 id="resources"><span class="header-section-number">1</span> Resources</h1>
+<h1 id="resources"><a href="#resources"><span class="header-section-number">1</span> Resources</a></h1>
 <ul>
 <li><p><a href="./paper.pdf">Paper</a></p></li>
 <li><p><a href="./beamer.pdf">Beamer</a></p></li>
 </ul>
 <hr />
-<h1 id="basic-information"><span class="header-section-number">2</span> Basic Information</h1>
-<h2 id="authors"><span class="header-section-number">2.1</span> Authors</h2>
+<h1 id="basic-information"><a href="#basic-information"><span class="header-section-number">2</span> Basic Information</a></h1>
+<h2 id="authors"><a href="#authors"><span class="header-section-number">2.1</span> Authors</a></h2>
 <ul>
 <li><p><strong>Christian Merfels</strong> is with Volkswagen Group Research, Wolfsburg, and Institute of Geodesy and Geoinformation, University of Bonn, Germany.</p></li>
 <li><p><strong>Cyrill Stachniss</strong> is with Institute of Geodesy and Geoinformation, University of Bonn, Germany.</p></li>
 </ul>
-<h2 id="conference"><span class="header-section-number">2.2</span> Conference</h2>
+<h2 id="conference"><a href="#conference"><span class="header-section-number">2.2</span> Conference</a></h2>
 <p>2016 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</p>
-<h2 id="abstract"><span class="header-section-number">2.3</span> Abstract</h2>
+<h2 id="abstract"><a href="#abstract"><span class="header-section-number">2.3</span> Abstract</a></h2>
 <ul>
 <li><p>Combining multiple localization systems in a <strong>plug and play manner</strong>.</p></li>
 <li><p>Formulate this approach as a <strong>sliding window pose graph</strong>.</p></li>
 <li><p>The pose fusion approach scales from a filtering-based to a batch solution by increasing the size of the sliding window.</p></li>
 <li><p>The experiment runs at 20Hz on both simulated and real data.</p></li>
 </ul>
-<h2 id="keywords"><span class="header-section-number">2.4</span> Keywords</h2>
+<h2 id="keywords"><a href="#keywords"><span class="header-section-number">2.4</span> Keywords</a></h2>
 <hr />
-<h1 id="introduction"><span class="header-section-number">3</span> Introduction</h1>
-<h2 id="problem-solution"><span class="header-section-number">3.1</span> Problem &amp; Solution</h2>
+<h1 id="introduction"><a href="#introduction"><span class="header-section-number">3</span> Introduction</a></h1>
+<h2 id="problem-solution"><a href="#problem-solution"><span class="header-section-number">3.1</span> Problem &amp; Solution</a></h2>
 <p>Individual localization system is not enough, and the combination of orthogonal localization systems is more powerful.</p>
-<h2 id="objective"><span class="header-section-number">3.2</span> Objective</h2>
+<h2 id="objective"><a href="#objective"><span class="header-section-number">3.2</span> Objective</a></h2>
 <p>This paper provides an approach to multi-sensor data fusion decouples the localization from the fusion task, which eneables the ability to incorporate third-party localization modules for which source code is unavailable.</p>
-<h2 id="formulation"><span class="header-section-number">3.3</span> Formulation</h2>
+<h2 id="formulation"><a href="#formulation"><span class="header-section-number">3.3</span> Formulation</a></h2>
 <p>A coarse localization (red triangles), a precise but only temporary available localization (blue triangles), and odometry as dead reckoning trajectory (blue) are used to estimate the true trajectory (red) of a vehicle. The estimated poses are shown as black triangles: the goal is to approximate the unknown red line as closely as possible with the black triangles.</p>
-<p><img src="./img/posefusion.png" alt="image" width="566" /></p>
-<h2 id="contributions"><span class="header-section-number">3.4</span> Contributions</h2>
+<p><img src="./img/posefusion.png" alt="image" /></p>
+<h2 id="contributions"><a href="#contributions"><span class="header-section-number">3.4</span> Contributions</a></h2>
 <ul>
-<li><p>efficient sensor fusion of generic odometry and global pose inputs <span class="math inline">\(\Rightarrow\)</span> an intuitive architecture for pose estimation and timing issues.</p></li>
-<li><p>graph construction algorithm <span class="math inline">\(\Rightarrow\)</span> a sparse block-tridiagonal structure of the system matrix <span class="math inline">\(\Rightarrow\)</span> fast solution</p></li>
+<li><p>efficient sensor fusion of generic odometry and global pose inputs <span class="math">\(\Rightarrow\)</span> an intuitive architecture for pose estimation and timing issues.</p></li>
+<li><p>graph construction algorithm <span class="math">\(\Rightarrow\)</span> a sparse block-tridiagonal structure of the system matrix <span class="math">\(\Rightarrow\)</span> fast solution</p></li>
 </ul>
 <hr />
-<h1 id="related-work"><span class="header-section-number">4</span> Related Work</h1>
-<h2 id="multi-sensor-data-fusion-for-navigation-systems"><span class="header-section-number">4.1</span> Multi-sensor data fusion for navigation systems</h2>
+<h1 id="related-work"><a href="#related-work"><span class="header-section-number">4</span> Related Work</a></h1>
+<h2 id="multi-sensor-data-fusion-for-navigation-systems"><a href="#multi-sensor-data-fusion-for-navigation-systems"><span class="header-section-number">4.1</span> Multi-sensor data fusion for navigation systems</a></h2>
 <ul>
 <li><p><strong>filtering-based approaches</strong>: Kalman filter and its variants</p>
 <ul>
@@ -128,7 +126,7 @@
 <li><p>Some implementations keep the size of the graph bounded by simply discarding older nodes and edges, thus potentially obtaining overconfident estimates.</p></li>
 </ul></li>
 </ul>
-<h2 id="methodical-origin"><span class="header-section-number">4.2</span> Methodical origin</h2>
+<h2 id="methodical-origin"><a href="#methodical-origin"><span class="header-section-number">4.2</span> Methodical origin</a></h2>
 <ul>
 <li><p>Sibley et al.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, who are the first to introduce the concept of a slibing window filter in the context of robotics.</p></li>
 <li><p>Differences:</p>
@@ -139,19 +137,21 @@
 </ul></li>
 </ul>
 <hr />
-<h1 id="method-pose-graph-fusion"><span class="header-section-number">5</span> Method: Pose Graph Fusion</h1>
-<h2 id="nonlinear-least-squares-problem"><span class="header-section-number">5.1</span> Nonlinear least squares problem</h2>
+<h1 id="method-pose-graph-fusion"><a href="#method-pose-graph-fusion"><span class="header-section-number">5</span> Method: Pose Graph Fusion</a></h1>
+<h2 id="nonlinear-least-squares-problem"><a href="#nonlinear-least-squares-problem"><span class="header-section-number">5.1</span> Nonlinear least squares problem</a></h2>
 <p>This paper exploits the state-of-the-art graph optimization framework g2o<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p>
-<p>The key idea is that given the state vector <span class="math inline">\(x=(x_1^T, ..., x_m^T)^T\)</span> and a set of measurements, where <span class="math inline">\(z_{ij}\)</span> is the mean and <span class="math inline">\(\Omega_{ij}\)</span> is the information matrix<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> of a single measurement relating <span class="math inline">\(x_i\)</span> to <span class="math inline">\(x_j\)</span>, least squares estimation seeks the state <span class="math display">\[x^*=\arg\min_x{\sum_{i,j}e_{ij}^T\Omega_{ij}e_{ij}}
-\label{eq:state}\]</span> that best explains all measurements given the <span class="math inline">\(\mathit{l}_2\)</span> norm. The vector error function <span class="math inline">\(e_{ij}=e(x_i,x_j,z_{ij})\)</span> measures how well the constraint from the measurement <span class="math inline">\(z_{ij}\)</span> is satisfied. Solving <span class="math inline">\((\ref{eq:state})\)</span> requires iteratively solving a linear system with the system matrix<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> <span class="math inline">\(H\)</span> and the right-hand side vector <span class="math inline">\(b\)</span> such that <span class="math display">\[H=\sum_{i,j}{J_{ij}(x)^T\Omega_{ij}J_{ij}(x)}\]</span> <span class="math display">\[b^T=\sum_{i,j}e_{ij}^T\Omega_{ij}J_{ij}(x)\]</span> where <span class="math inline">\(J_{ij}(x)\)</span> refers to the Jacobian<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> of the error function computed in state <span class="math inline">\(x\)</span>.</p>
-<h2 id="sliding-window-chain-pose-graph-fusion"><span class="header-section-number">5.2</span> Sliding window chain pose graph fusion</h2>
-<h3 id="about-the-online-state-estimation-system"><span class="header-section-number">5.2.1</span> About the online state estimation system</h3>
+<p>The key idea is that given the state vector <span class="math">\(x=(x_1^T, ..., x_m^T)^T\)</span> and a set of measurements, where <span class="math">\(z_{ij}\)</span> is the mean and <span class="math">\(\Omega_{ij}\)</span> is the information matrix<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> of a single measurement relating <span class="math">\(x_i\)</span> to <span class="math">\(x_j\)</span>, least squares estimation seeks the state</p>
+<p><span class="math">\[x^*=\arg\min_x{\sum_{i,j}e_{ij}^T\Omega_{ij}e_{ij}}
+\label{eq:state}\]</span></p>
+<p>that best explains all measurements given the <span class="math">\(\mathit{l}_2\)</span> norm. The vector error function <span class="math">\(e_{ij}=e(x_i,x_j,z_{ij})\)</span> measures how well the constraint from the measurement <span class="math">\(z_{ij}\)</span> is satisfied. Solving <span class="math">\((\ref{eq:state})\)</span> requires iteratively solving a linear system with the system matrix<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> <span class="math">\(H\)</span> and the right-hand side vector <span class="math">\(b\)</span> such that <span class="math">\[H=\sum_{i,j}{J_{ij}(x)^T\Omega_{ij}J_{ij}(x)}\]</span> <span class="math">\[b^T=\sum_{i,j}e_{ij}^T\Omega_{ij}J_{ij}(x)\]</span> where <span class="math">\(J_{ij}(x)\)</span> refers to the Jacobian<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> of the error function computed in state <span class="math">\(x\)</span>.</p>
+<h2 id="sliding-window-chain-pose-graph-fusion"><a href="#sliding-window-chain-pose-graph-fusion"><span class="header-section-number">5.2</span> Sliding window chain pose graph fusion</a></h2>
+<h3 id="about-the-online-state-estimation-system"><a href="#about-the-online-state-estimation-system"><span class="header-section-number">5.2.1</span> About the online state estimation system</a></h3>
 <ul>
 <li><p>general nonlinear least squares estimation taks into account all available information within the full pose graph</p></li>
 <li><p>to keep the problem computationally tractable, it is necessary to limit the considered information.</p></li>
-<li><p>this approach achieves this by marginalizing out prior state state variables and the state vector <span class="math inline">\(x\)</span> in a sliding window pose graph is reduced to the M most recent states <span class="math inline">\(x=(x_{t-M+1}^T,...,x_t^T)^T\)</span>.</p></li>
+<li><p>this approach achieves this by marginalizing out prior state state variables and the state vector <span class="math">\(x\)</span> in a sliding window pose graph is reduced to the M most recent states <span class="math">\(x=(x_{t-M+1}^T,...,x_t^T)^T\)</span>.</p></li>
 </ul>
-<h3 id="about-the-graph-structure"><span class="header-section-number">5.2.2</span> About the graph structure</h3>
+<h3 id="about-the-graph-structure"><a href="#about-the-graph-structure"><span class="header-section-number">5.2.2</span> About the graph structure</a></h3>
 <ul>
 <li><p>global pose source: measure poses within a global coordinate system, e.g. Universal Transverse Mercator (UTM) coordinate</p></li>
 <li><p>local pose source: measure spatial transformations relative to the previous pose, e.g. odometry</p></li>
@@ -160,8 +160,8 @@
 <li><p>edge between hidden nodes: local pose constraints.</p></li>
 <li><p>The resulting form or the graph is called <strong>chain pose graph</strong>.</p></li>
 </ul>
-<p><img src="./img/posegraph.png" alt="image" width="566" /></p>
-<h3 id="about-the-algorithm-working-frequency"><span class="header-section-number">5.2.3</span> About the algorithm working frequency</h3>
+<p><img src="./img/posegraph.png" alt="image" /></p>
+<h3 id="about-the-algorithm-working-frequency"><a href="#about-the-algorithm-working-frequency"><span class="header-section-number">5.2.3</span> About the algorithm working frequency</a></h3>
 <ul>
 <li><p>Related graph-based approaches.</p>
 <ul>
@@ -175,14 +175,14 @@
 <li><p>enforce a certain matrix structure for H, to include all measurement sources in a generic way independetly of their specific output frequencies, and to a priori relate the number of state variables to the length of the interval of the sliding window.</p></li>
 </ul></li>
 </ul>
-<h3 id="about-the-system-matrix-h"><span class="header-section-number">5.2.4</span> About the system matrix <span class="math inline">\(H\)</span></h3>
+<h3 id="about-the-system-matrix-h"><a href="#about-the-system-matrix-h"><span class="header-section-number">5.2.4</span> About the system matrix <span class="math">\(H\)</span></a></h3>
 <ul>
 <li><p>The block-tridiagonal structure is a consequence of the linear temporal ordering of the state variables combined with the fact that edges are at most constructed between successive nodes.</p></li>
-<li><p>This structure does not produce fill-in in system matrix <span class="math inline">\(H\)</span> after marginalization of the oldest state variables.</p></li>
-<li><p>Beyond that, even the Cholesky factorization<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a> <span class="math inline">\(H=R^TR\)</span>, which this paper perform to solve the linear system, does not suffer from fill-in in its triangular matrix <span class="math inline">\(R\)</span> (becomes a band matrix).</p></li>
-<li><p>The computational complexity of this approach is efficiently solvable in <span class="math inline">\(\mathcal{O}(n)\)</span>.</p></li>
+<li><p>This structure does not produce fill-in in system matrix <span class="math">\(H\)</span> after marginalization of the oldest state variables.</p></li>
+<li><p>Beyond that, even the Cholesky factorization<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a> <span class="math">\(H=R^TR\)</span>, which this paper perform to solve the linear system, does not suffer from fill-in in its triangular matrix <span class="math">\(R\)</span> (becomes a band matrix).</p></li>
+<li><p>The computational complexity of this approach is efficiently solvable in <span class="math">\(\mathcal{O}(n)\)</span>.</p></li>
 </ul>
-<h2 id="time-behavior"><span class="header-section-number">5.3</span> Time behavior</h2>
+<h2 id="time-behavior"><a href="#time-behavior"><span class="header-section-number">5.3</span> Time behavior</a></h2>
 <ul>
 <li><p>Define time behavior as the latency, frequency, and availability of estimate. The output of the PoseGraphFusion is time-triggered.</p></li>
 <li><p>Difficulties:</p>
@@ -203,15 +203,15 @@
 </ul></li>
 <li><p>The estimation result is subsequently propagated into the future to the start of the next cycle with a constant turn rate and velocity model.</p></li>
 </ol>
-<p><img src="./img/timebehavior.png" alt="image" width="377" /></p></li>
+<p><img src="./img/timebehavior.png" alt="image" /></p></li>
 <li><p>The backward-forward computations problem of conventional Kalman filtering approaches: to integrate a new measurement, it has to propagate its state back in time to the time of the measurement, apply the measurement, and re-apply all other stored measurements.</p></li>
 </ul>
-<h2 id="marginalization-in-the-form-of-a-prior-node"><span class="header-section-number">5.4</span> Marginalization in the form of a prior node</h2>
+<h2 id="marginalization-in-the-form-of-a-prior-node"><a href="#marginalization-in-the-form-of-a-prior-node"><span class="header-section-number">5.4</span> Marginalization in the form of a prior node</a></h2>
 <ul>
 <li><p>Motivation: limit the amount of hidden nodes to maintain constant runtime complexity.</p></li>
 <li><p>Problem: Simply removing edges and nodes leads to information loss and is equivalent to conditioning, which potentially leads to overconfidence.</p></li>
 <li><p>Solution: only marginalize the oldest nodes. This truncates the graph but retains the same information (given te linearization point).</p></li>
-<li><p>Common method: Computing the Schur complement<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a> on the system matrix <span class="math inline">\(H\)</span>.</p>
+<li><p>Common method: Computing the Schur complement<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a> on the system matrix <span class="math">\(H\)</span>.</p>
 <ul>
 <li><p>Potential problem: may introduce conditional dependencies between state variables that are connected.</p></li>
 <li><p>however, the structure of the chain pose graph is able to retain the same sparsity pattern and do not suffer from a denser system matrix after marginalization.</p></li>
@@ -223,16 +223,16 @@
 <li><p>it opens up the possibility to explicitly apply a robust kernel on the cost function of the prior node and to adjust the uncertainty of the prior information based on context.</p></li>
 </ul></li>
 </ul>
-<h3 id="effect-of-the-schur-complement-on-chain-pose-graphs"><span class="header-section-number">5.4.1</span> Effect of the Schur complement on chain pose graphs</h3>
-<p><img src="./img/schur.png" alt="image" width="377" /></p>
-<p><span class="math display">\[H^{small} \Delta x^{small} =\left[\begin{array}{cc}
+<h3 id="effect-of-the-schur-complement-on-chain-pose-graphs"><a href="#effect-of-the-schur-complement-on-chain-pose-graphs"><span class="header-section-number">5.4.1</span> Effect of the Schur complement on chain pose graphs</a></h3>
+<p><img src="./img/schur.png" alt="image" /></p>
+<p><span class="math">\[H^{small} \Delta x^{small} =\left[\begin{array}{cc}
 H_{bb}^{small} &amp; H_{bc}^{small} \\
 H_{cb}^{small} &amp; H_{cc}^{small} \\
 \end{array}\right] \Delta x^{small} = - \left[\begin{array}{c}
 b_{b}^{small} \\
 b_{c}^{small} \\
 \end{array}\right]\]</span></p>
-<p><span class="math display">\[\begin{array}{rcl}
+<p><span class="math">\[\begin{array}{rcl}
 H^{full} \Delta x^{full} &amp; = &amp; \left[\begin{array}{ccc}
 \bar{H}_{aa} + \hat{H}_{aa} &amp; \hat{H}_{ab} &amp; 0 \\
 \hat{H}_{ba} &amp; H_{bb}^{small} + \hat{H}_{bb} &amp; H_{bc}^{small} \\
@@ -263,14 +263,16 @@ b_b^{small} + \hat{b}_b \\
 b_c^{small} \\
 \end{array}\right]\\ 
 \end{array}\]</span></p>
-<p>Use Schur complement of <span class="math inline">\(H^{full}\)</span> and <span class="math inline">\(b^{full}\)</span> to marginalize <span class="math inline">\(x_a\)</span> <a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> <span class="math display">\[\begin{array}{rcl}
+<p>Use Schur complement of <span class="math">\(H^{full}\)</span> and <span class="math">\(b^{full}\)</span> to marginalize <span class="math">\(x_a\)</span> <a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a></p>
+<p><span class="math">\[\begin{array}{rcl}
 \left[\begin{array}{cc}
 \bar{H}_{aa} + \hat{H}_{aa} &amp; \hat{H}_{ab} \\
 \hat{H}_{ba} &amp; \hat{H}_{bb} \\
 \end{array}\right] &amp; \Rightarrow &amp; H^{schur}=\hat{H}_{bb}-\hat{H}_{ba}(\bar{H}_{aa}+\hat{H}_{aa})^{-1}\hat{H}_{ab} \\
 b^{schur}=H^{schur}\Delta x_b &amp; = &amp; \hat{b}_b - \hat{H}_{ba}(\bar{H}_{aa}+\hat{H}_{aa})^{-1}(\bar{b}_a+\hat{b}_a) \\
 \end{array}\]</span></p>
-<p>The marginalized system matrix <span class="math inline">\(H^{marg}\)</span> and coefficient vector <span class="math inline">\(b^{marg}\)</span> <span class="math display">\[\begin{array}{rcl}
+<p>The marginalized system matrix <span class="math">\(H^{marg}\)</span> and coefficient vector <span class="math">\(b^{marg}\)</span></p>
+<p><span class="math">\[\begin{array}{rcl}
 H^{marg} &amp; = &amp; \left[\begin{array}{cc}
 H_{bb}^{small} + H^{schur} &amp; H_{bc}^{small} \\
 H_{cb}^{small} &amp; H_{cc}^{small} \\
@@ -280,9 +282,10 @@ b_b^{small} + b^{schur} \\
 b_c^{small} \\
 \end{array}\right]
 \end{array}\]</span></p>
-<p>After the marginalization, the structure of the system matrix is still block-tridiagonal due to the particular design of the chain pose graph, meaning that the sparsity pattern of <span class="math inline">\(H\)</span> is retained after marginalization without fill-in.</p>
-<h3 id="derivation-of-the-prior-node"><span class="header-section-number">5.4.2</span> Derivation of the prior node</h3>
-<p>A different marginalization method to replace <span class="math inline">\(x_a\)</span> and its connected observed nodes and edges with a prior node <span class="math inline">\(\bar{x}_p\)</span> (will be a measurement). The result is same, but the marginalized nodes can be visualized as an observed node. <span class="math display">\[\begin{array}{rcl}
+<p>After the marginalization, the structure of the system matrix is still block-tridiagonal due to the particular design of the chain pose graph, meaning that the sparsity pattern of <span class="math">\(H\)</span> is retained after marginalization without fill-in.</p>
+<h3 id="derivation-of-the-prior-node"><a href="#derivation-of-the-prior-node"><span class="header-section-number">5.4.2</span> Derivation of the prior node</a></h3>
+<p>A different marginalization method to replace <span class="math">\(x_a\)</span> and its connected observed nodes and edges with a prior node <span class="math">\(\bar{x}_p\)</span> (will be a measurement). The result is same, but the marginalized nodes can be visualized as an observed node.</p>
+<p><span class="math">\[\begin{array}{rcl}
 H^{prior} &amp; = &amp; \left[\begin{array}{cc}
 H_{bb}^{small} + \bar{H}^{prior} &amp; H_{bc}^{small} \\
 H_{cb}^{small} &amp; H_{cc}^{small} \\
@@ -291,7 +294,9 @@ b^{prior} &amp; = &amp; \left[\begin{array}{c}
 b_b^{small} + \bar{b}^{prior} \\
 b_c^{small} \\
 \end{array}\right]
-\end{array}\]</span> The <span class="math inline">\(x_p\)</span> can be defined as the mean estimate of any observed node of <span class="math inline">\(x_b\)</span>. Then define the error function <span class="math inline">\(e_{pb}\)</span> and consequently its Jacobian <span class="math inline">\(J_{pb}(x)\)</span>. <span class="math display">\[\begin{array}{rcl}
+\end{array}\]</span></p>
+<p>The <span class="math">\(x_p\)</span> can be defined as the mean estimate of any observed node of <span class="math">\(x_b\)</span>. Then define the error function <span class="math">\(e_{pb}\)</span> and consequently its Jacobian <span class="math">\(J_{pb}(x)\)</span>.</p>
+<p><span class="math">\[\begin{array}{rcl}
 e_{pb} &amp; = &amp; \left[\begin{array}{cc}
 R &amp; 0 \\
 0 &amp; 1 \\
@@ -301,14 +306,16 @@ R &amp; 0 \\
 0 &amp; 1 \\
 \end{array}\right]
 \end{array}\]</span></p>
-<p>Therefore <span class="math display">\[\begin{array}{rcl}
+<p>Therefore</p>
+<p><span class="math">\[\begin{array}{rcl}
 \bar{H}_p &amp; = &amp; J_{pb}(x)^T \bar{\Omega}_p J_{pb}(x) = H^{schur}\\
 \Rightarrow \bar{\Omega}_p &amp; = &amp; (J_{pb}(x)^T)^{-1} H^{schur} (J_{pb}(x))^{-1} \\
 \bar{b}_p &amp; = &amp; J_{pb}(x)^T \bar{\Omega}_p e_{pb} = J_{pb}(x)^T \bar{\Omega}_p J_{pb}(x) (x_b-\bar{x}_p) = \bar{H}_p(x_b-\bar{x}_p) \\
 \Rightarrow \bar{x}_p &amp; = &amp; x_b-(H^{schur})^-1 b^{schur} \\
 \end{array}\]</span></p>
-<h2 id="assessing-the-uncertainty-of-the-fused-estimate"><span class="header-section-number">5.5</span> Assessing the uncertainty of the fused estimate</h2>
-<p>The optimization assigns to the hidden nodes the global poses which best satisfy all constraints. Solving the nonlinear least squares problem of the pose fusion with a sparse solver typically involves computing the Cholesky factorization <span class="math inline">\(H=R^TR\)</span>, where <span class="math inline">\(R\)</span> is an upper triangular matrix with entries <span class="math inline">\(r_ij\)</span>. Following the referred paper [13]<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>, the uncertainty matrix of the hidden nodes <span class="math inline">\(H^{-1}\)</span> with entries <span class="math inline">\(H_{ij}^{-1}\)</span> is obtained by the recursive formula: <span class="math display">\[\begin{array}{rcl}
+<h2 id="assessing-the-uncertainty-of-the-fused-estimate"><a href="#assessing-the-uncertainty-of-the-fused-estimate"><span class="header-section-number">5.5</span> Assessing the uncertainty of the fused estimate</a></h2>
+<p>The optimization assigns to the hidden nodes the global poses which best satisfy all constraints. Solving the nonlinear least squares problem of the pose fusion with a sparse solver typically involves computing the Cholesky factorization <span class="math">\(H=R^TR\)</span>, where <span class="math">\(R\)</span> is an upper triangular matrix with entries <span class="math">\(r_ij\)</span>. Following the referred paper [13]<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>, the uncertainty matrix of the hidden nodes <span class="math">\(H^{-1}\)</span> with entries <span class="math">\(H_{ij}^{-1}\)</span> is obtained by the recursive formula:</p>
+<p><span class="math">\[\begin{array}{rcl}
 H_{ii}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[\frac{1}{r_{ii}}-\sum_{\begin{array}{c}
     k=i+1 \\
     r_{ik} \neq 0 \\
@@ -320,8 +327,9 @@ H_{ij}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[-\sum_{\begin{array}{c}
     k=j+1 \\
     r_{ik} \neq 0 \\
     \end{array}}^{n}{r_{ik}H_{jk}^{-1}}\right]
-\end{array}\]</span> The formula yields an <span class="math inline">\(\mathbb{O}(n)\)</span> time complexity with <span class="math inline">\(n\)</span> being the number of state variables. It becomes constant time for sliding window pose graphs as the number of state variables is upper bounded by a constant value.</p>
-<h2 id="noise-correlations-between-input-sources"><span class="header-section-number">5.6</span> Noise correlations between input sources</h2>
+\end{array}\]</span></p>
+<p>The formula yields an <span class="math">\(\mathbb{O}(n)\)</span> time complexity with <span class="math">\(n\)</span> being the number of state variables. It becomes constant time for sliding window pose graphs as the number of state variables is upper bounded by a constant value.</p>
+<h2 id="noise-correlations-between-input-sources"><a href="#noise-correlations-between-input-sources"><span class="header-section-number">5.6</span> Noise correlations between input sources</a></h2>
 <ul>
 <li><p>This method needs to apply appropriate preprocessing (covariance intersection<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a>) if noise is correlated between input sources:</p>
 <ul>
@@ -330,10 +338,10 @@ H_{ij}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[-\sum_{\begin{array}{c}
 </ul></li>
 <li><p>Combine groups of sources with correlated noise into a single consistent estimate.</p></li>
 </ul>
-<h1 id="evaluation"><span class="header-section-number">6</span> Evaluation</h1>
+<h1 id="evaluation"><a href="#evaluation"><span class="header-section-number">6</span> Evaluation</a></h1>
 <p>Baseline: the online ML (maximum likelihood) estimate, scaling from a filtering to a batch least squares solution.</p>
-<h2 id="experiment-on-a-real-prototype-vehicle"><span class="header-section-number">6.1</span> Experiment on a real prototype vehicle</h2>
-<h3 id="settings"><span class="header-section-number">6.1.1</span> Settings</h3>
+<h2 id="experiment-on-a-real-prototype-vehicle"><a href="#experiment-on-a-real-prototype-vehicle"><span class="header-section-number">6.1</span> Experiment on a real prototype vehicle</a></h2>
+<h3 id="settings"><a href="#settings"><span class="header-section-number">6.1.1</span> Settings</a></h3>
 <ul>
 <li><p>global sources:</p>
 <ul>
@@ -342,61 +350,59 @@ H_{ij}^{-1} &amp; = &amp; \frac{1}{r_{ii}}\left[-\sum_{\begin{array}{c}
 <li><p>source 2: visual localization system with a globally referenced feature map.</p></li>
 </ul></li>
 <li><p>local source: wheel odometry.</p></li>
-<li><p>sliding window size: <span class="math inline">\(M=1000\)</span></p></li>
-<li><p>temporal resolution: <span class="math inline">\(\Delta t=25ms\)</span></p></li>
-<li><p>experiment route: <span class="math inline">\(16km\)</span> in rural and urban areas in Germany.</p></li>
+<li><p>sliding window size: <span class="math">\(M=1000\)</span></p></li>
+<li><p>temporal resolution: <span class="math">\(\Delta t=25ms\)</span></p></li>
+<li><p>experiment route: <span class="math">\(16km\)</span> in rural and urban areas in Germany.</p></li>
 </ul>
-<h3 id="pose-estimate-quality"><span class="header-section-number">6.1.2</span> Pose estimate quality</h3>
-<p>Baseline: batch solution.<br />
-Noises are not independently distributed with zero mean and the uncertainty models are unknown.</p>
+<h3 id="pose-estimate-quality"><a href="#pose-estimate-quality"><span class="header-section-number">6.1.2</span> Pose estimate quality</a></h3>
+<p>Baseline: batch solution.<br />Noises are not independently distributed with zero mean and the uncertainty models are unknown.</p>
 <ul>
-<li><p>source 0: <span class="math inline">\(RMS=1.06m\)</span></p></li>
-<li><p>source 1: <span class="math inline">\(RMS=1.23m\)</span></p></li>
-<li><p>source 2: <span class="math inline">\(RMS=0.28m\)</span></p></li>
-<li><p>PoseGraphFusion: <span class="math inline">\(RMS=0.38m\)</span></p></li>
+<li><p>source 0: <span class="math">\(RMS=1.06m\)</span></p></li>
+<li><p>source 1: <span class="math">\(RMS=1.23m\)</span></p></li>
+<li><p>source 2: <span class="math">\(RMS=0.28m\)</span></p></li>
+<li><p>PoseGraphFusion: <span class="math">\(RMS=0.38m\)</span></p></li>
 </ul>
-<p><img src="./img/error.png" alt="image" width="377" /></p>
-<h3 id="latency-and-availability"><span class="header-section-number">6.1.3</span> Latency and availability</h3>
-<p>Latency: <span class="math inline">\(\leq 10ms\)</span>.<br />
-Availability:</p>
+<p><img src="./img/error.png" alt="image" /></p>
+<h3 id="latency-and-availability"><a href="#latency-and-availability"><span class="header-section-number">6.1.3</span> Latency and availability</a></h3>
+<p>Latency: <span class="math">\(\leq 10ms\)</span>.<br />Availability:</p>
 <ul>
-<li><p>source 0: <span class="math inline">\(66.98\%\)</span></p></li>
-<li><p>source 1 with odometry: <span class="math inline">\(100\%\)</span></p></li>
-<li><p>source 2: <span class="math inline">\(97.76\%\)</span></p></li>
-<li><p>PoseGraphFusion: <span class="math inline">\(100\%\)</span></p></li>
+<li><p>source 0: <span class="math">\(66.98\%\)</span></p></li>
+<li><p>source 1 with odometry: <span class="math">\(100\%\)</span></p></li>
+<li><p>source 2: <span class="math">\(97.76\%\)</span></p></li>
+<li><p>PoseGraphFusion: <span class="math">\(100\%\)</span></p></li>
 </ul>
-<h3 id="runtime-performance"><span class="header-section-number">6.1.4</span> Runtime performance</h3>
+<h3 id="runtime-performance"><a href="#runtime-performance"><span class="header-section-number">6.1.4</span> Runtime performance</a></h3>
 <p>a single core of a laptop with an Intel i7-4800QM processor</p>
-<p><img src="./img/runtime.png" alt="image" width="321" /> <img src="./img/relationship.png" alt="image" width="321" /></p>
-<h2 id="simulated-input-data"><span class="header-section-number">6.2</span> Simulated input data</h2>
-<h3 id="number-of-hidden-nodes-v.s.-accuracy"><span class="header-section-number">6.2.1</span> Number of hidden nodes v.s. accuracy</h3>
-<p>Larger sliding window size <span class="math inline">\(\Rightarrow\)</span> more accurate result</p>
-<p><img src="./img/accuracy.png" alt="image" width="377" /></p>
-<h3 id="number-of-pose-sources-v.s.-accuracy"><span class="header-section-number">6.2.2</span> Number of pose sources v.s. accuracy</h3>
-<p>More pose sources <span class="math inline">\(\Rightarrow\)</span> more accurate result</p>
-<p><img src="./img/sources.png" alt="image" width="377" /></p>
-<h1 id="conclusion"><span class="header-section-number">7</span> Conclusion</h1>
+<p><img src="./img/runtime.png" alt="image" /> <img src="./img/relationship.png" alt="image" /></p>
+<h2 id="simulated-input-data"><a href="#simulated-input-data"><span class="header-section-number">6.2</span> Simulated input data</a></h2>
+<h3 id="number-of-hidden-nodes-v.s.-accuracy"><a href="#number-of-hidden-nodes-v.s.-accuracy"><span class="header-section-number">6.2.1</span> Number of hidden nodes v.s. accuracy</a></h3>
+<p>Larger sliding window size <span class="math">\(\Rightarrow\)</span> more accurate result</p>
+<p><img src="./img/accuracy.png" alt="image" /></p>
+<h3 id="number-of-pose-sources-v.s.-accuracy"><a href="#number-of-pose-sources-v.s.-accuracy"><span class="header-section-number">6.2.2</span> Number of pose sources v.s. accuracy</a></h3>
+<p>More pose sources <span class="math">\(\Rightarrow\)</span> more accurate result</p>
+<p><img src="./img/sources.png" alt="image" /></p>
+<h1 id="conclusion"><a href="#conclusion"><span class="header-section-number">7</span> Conclusion</a></h1>
 <ul>
 <li><p>Motivation: the need for fast, recent, accurate, and highly available pose estimates.</p></li>
 <li><p>Method: a sliding window graph-based optimization scheme.</p></li>
 <li><p>The design of chain pose graphs for efficient optimization.</p></li>
 </ul>
 <hr />
-<h1 id="note"><span class="header-section-number">8</span> Note</h1>
+<h1 id="note"><a href="#note"><span class="header-section-number">8</span> Note</a></h1>
 <section class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>M. Kaess, H. Johannsson, R. Roberts, V. Ila, J. Leonard, and F. Del- laert, “iSAM2: Incremental Smoothing and Mapping using the Bayes tree,&quot; Int. Journal of Robotics Research, pp. 216–235, 2012.<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p>G. Sibley, L. Matthies, and G. Sukhatme, “SlidingWindow Filter with Application to Planetary Landing,&quot; Journal of Field Robotics, vol. 27, no. 5, pp. 587–608, 2010<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>R. K¨ ummerle, G. Grisetti, H. Strasdat, K. Konolige, and W. Burgard, “g2o: A General Framework for Graph Optimization,&quot; in Proc. IEEE Int. Conf. Robotics and Automation (ICRA), 2011, pp. 3607–3613.<a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p><span class="math inline">\(\Omega=\Sigma^{-1}\)</span>, <span class="math inline">\(b=\Omega \mu\)</span><a href="#fnref4">↩</a></p></li>
-<li id="fn5"><p><a href="https://en.wikipedia.org/wiki/State-space_representation" class="uri">https://en.wikipedia.org/wiki/State-space_representation</a><a href="#fnref5">↩</a></p></li>
-<li id="fn6"><p><a href="https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant" class="uri">https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant</a><a href="#fnref6">↩</a></p></li>
-<li id="fn7"><p><a href="https://en.wikipedia.org/wiki/Cholesky_decomposition" class="uri">https://en.wikipedia.org/wiki/Cholesky_decomposition</a><a href="#fnref7">↩</a></p></li>
-<li id="fn8"><p><a href="https://en.wikipedia.org/wiki/Schur_complement" class="uri">https://en.wikipedia.org/wiki/Schur_complement</a><a href="#fnref8">↩</a></p></li>
-<li id="fn9"><p><span class="math inline">\(\hat{H}_{ab}\Delta x_b=(\bar{b}_a+\hat{b}_a)-(\bar{H}_{aa}+\hat{H}_aa)\Delta x_a,\text{~where~}\Delta x_a=0\)</span><a href="#fnref9">↩</a></p></li>
-<li id="fn10"><p>M. Kaess and F. Dellaert, “Covariance Recovery from a Square Root Information Matrix for Data Association,&quot; Robotics and Autonomous Systems, pp. 1198–1210, 2009.<a href="#fnref10">↩</a></p></li>
-<li id="fn11"><p>S. J. Julier and J. K. Uhlmann, “A non-divergent estimation algorithm in the presence of unknown correlations,&quot; in Proc. Amer. Control Conf. (ACC), 1997, pp. 2369–2373.<a href="#fnref11">↩</a></p></li>
+<li id="fn1"><p>M. Kaess, H. Johannsson, R. Roberts, V. Ila, J. Leonard, and F. Del- laert, ``iSAM2: Incremental Smoothing and Mapping using the Bayes tree,&quot; Int. Journal of Robotics Research, pp. 216–235, 2012.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>G. Sibley, L. Matthies, and G. Sukhatme, ``SlidingWindow Filter with Application to Planetary Landing,&quot; Journal of Field Robotics, vol. 27, no. 5, pp. 587–608, 2010<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>R. K¨ ummerle, G. Grisetti, H. Strasdat, K. Konolige, and W. Burgard, ``g2o: A General Framework for Graph Optimization,&quot; in Proc. IEEE Int. Conf. Robotics and Automation (ICRA), 2011, pp. 3607–3613.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><span class="math">\(\Omega=\Sigma^{-1}\)</span>, <span class="math">\(b=\Omega \mu\)</span><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p><a href="https://en.wikipedia.org/wiki/State-space_representation">https://en.wikipedia.org/wiki/State-space_representation</a><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p><a href="https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant">https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant</a><a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p><a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">https://en.wikipedia.org/wiki/Cholesky_decomposition</a><a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p><a href="https://en.wikipedia.org/wiki/Schur_complement">https://en.wikipedia.org/wiki/Schur_complement</a><a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p><span class="math">\(\hat{H}_{ab}\Delta x_b=(\bar{b}_a+\hat{b}_a)-(\bar{H}_{aa}+\hat{H}_aa)\Delta x_a,\text{~where~}\Delta x_a=0\)</span><a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p>M. Kaess and F. Dellaert, ``Covariance Recovery from a Square Root Information Matrix for Data Association,&quot; Robotics and Autonomous Systems, pp. 1198–1210, 2009.<a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>S. J. Julier and J. K. Uhlmann, ``A non-divergent estimation algorithm in the presence of unknown correlations,&quot; in Proc. Amer. Control Conf. (ACC), 1997, pp. 2369–2373.<a href="#fnref11">↩</a></p></li>
 </ol>
 </section>
 </body>
