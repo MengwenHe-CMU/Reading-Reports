@@ -65,8 +65,10 @@
 <hr />
 <h1 id="introduction"><a href="#introduction"><span class="header-section-number">3</span> Introduction</a></h1>
 <h2 id="problem-solution"><a href="#problem-solution"><span class="header-section-number">3.1</span> Problem &amp; Solution</a></h2>
-<p>A　wide range of problems in robotics as well as in computer-vision involve the minimization of a non-linear error function that can be represented as a graph.</p>
+<p>A　wide range of problems in robotics as well as in computer-vision involve the minimization of a non-linear error function that can be represented as a graph. The overall goal is to find the configuration of parameters or state variables that maximally explain a set of measurements affected by Gaussian noise.</p>
+<p>A naive implementation using standard methods like Gauss-Newton, Levenberg-Marquardt (LM), Gauss-Seidel relaxation, or variants of gradient descent typically provides acceptable results for most applications. However, to achieve the maximum performance substantial efforts and domain knowledge are required.</p>
 <h2 id="objective"><a href="#objective"><span class="header-section-number">3.2</span> Objective</a></h2>
+<p>A general framework for performing the optimization of nonlinear least squares problems that can be represented as a graph. This framework is named as <span class="math">\(g^2\)</span> (general graph optimization).</p>
 <h2 id="formulation"><a href="#formulation"><span class="header-section-number">3.3</span> Formulation</a></h2>
 <h2 id="contributions"><a href="#contributions"><span class="header-section-number">3.4</span> Contributions</a></h2>
 <ul>
