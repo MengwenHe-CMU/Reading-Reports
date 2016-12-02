@@ -9,6 +9,6 @@ do
   if [ $NAME == "index" ]; then
     pandoc $TEXFILE -f latex -t html5 -s -o $HTMLNAME
   elif [ $NAME == "document" ]; then
-    pandoc $TEXFILE -f latex -t html5 -H header -N --toc --mathjax -s -o $HTMLNAME
+    pandoc $TEXFILE -f latex -t html5 -H header -N --toc --mathjax="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML" -o $HTMLNAME
   fi
 done
